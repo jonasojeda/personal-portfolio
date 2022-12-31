@@ -9,14 +9,6 @@ import validator from "./validator";
 
 export const Contact = () => {
 
-  const sendEmail = (event) => {
-    event.preventDefault();
-
-    emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',event.target,'6CtWNYVRNqRmedPgn')
-    .then(response => console.log(response))
-    .catch(error => console.log(error))
-  }
-
   const formInitialDetails = {
     firstName: '',
     lastName: '',
