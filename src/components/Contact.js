@@ -30,20 +30,23 @@ export const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    
-
-    setButtonText("Sending...");
-    let res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn')
-    
-    setButtonText("Send");
-    setFormDetails(formInitialDetails);
-    if (res.status == 200) {
-      setStatus({clas:'alert alert-success shadow-lg', succes: true, message: 'Message sent successfully'});
-    } else {
-      setStatus({ clas:'alert alert-error shadow-lg', succes: false, message: 'Something went wrong, please try again later.'});
+    if(formDetails.email && formDetails.firstName && formDetails.lastName && formDetails.message){
+      setButtonText("Sending...");
+      let res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn')
+      
+      setButtonText("Send");
+      setFormDetails(formInitialDetails);
+      if (res.status == 200) {
+        setStatus({clas:'alert alert-success', succes: true, message: 'Message sent successfully'});
+      } else {
+        setStatus({ clas:'alert alert-danger', succes: false, message: 'Something went wrong, please try again later.'});
+      }
+    }else{
+      setStatus({clas:'alert alert-danger', succes: true, message: 'Please complete the required fields *.'});
     }
 
     
+
   };
 
   return (
@@ -80,11 +83,15 @@ export const Contact = () => {
                       <textarea name="message" rows="6" value={formDetails.message} placeholder="Message" onChange={(e) => onFormUpdate('message', e.target.value)}></textarea>
                       {
                       status.message &&
-                        <div className={status.success === false ? "alert alert-error shadow-lg" : "alert alert-success shadow-lg"}>
-                        <div>
-                          <span>{status.message}</span>
+                        
+                        <div class={status.clas} role="alert">
+                          {status.message}
                         </div>
-                        </div>
+                        // <div className={status.success === false ? "alert alert-error shadow-lg" : "alert alert-success shadow-lg"}>
+                        // <div>
+                        //   <span>{status.message}</span>
+                        // </div>
+                        // </div>
                       }
                       <button type="submit"><span>{buttonText}</span></button>
                     </Col>
