@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import headerImg from "../assets/img/header-img.png";
-import { ArrowRightCircle } from 'react-bootstrap-icons';
+import { ArrowRightCircle, Download, } from 'react-bootstrap-icons';
 import { HashLink } from 'react-router-hash-link';
 import 'animate.css';
 import TrackVisibility from 'react-on-screen';
-
+import cv from '../assets/cv.pdf'
 export const Banner = () => {
   const [loopNum, setLoopNum] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -61,7 +61,9 @@ export const Banner = () => {
                   <p><strong>Hello, my name is Jonas. I am a curious person, constantly developing my skills. Prepared to face various challenges and seek solutions. In a work environment, for me the main pillars are commitment and responsibility.</strong></p>
                   
                   {/* <HashLink to='#connect'> </HashLink> */}
-                  <button>Let’s Connect <ArrowRightCircle size={25} /></button>
+                  <a href={cv} download='cv'> 
+                  <button>Download CV<Download size={25} /></button>
+                  </a>
                   
               </div>}
             </TrackVisibility>

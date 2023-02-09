@@ -1,6 +1,8 @@
 import { Container, Row, Col, Tab, Nav } from "react-bootstrap";
 import { ProjectCard } from "./ProjectCard";
 import pokemon from "../assets/img/pokemon-app.png";
+import scaneame from "../assets/img/Scaneame.png";
+import todo_app from "../assets/img/todo-app.png";
 import colorSharp2 from "../assets/img/color-sharp2.png";
 import 'animate.css';
 import TrackVisibility from 'react-on-screen';
@@ -13,8 +15,25 @@ export const Projects = () => {
       description: "Api rest Pokemon",
       imgUrl: pokemon,
       gitHub:"https://github.com/jonasojeda/Pokemn_App",
-      deploy:"",
+      deploy:"https://pokemn-app.vercel.app/",
       video:"https://www.youtube.com/watch?v=u4vDry9uJZ0&ab_channel=jonasojeda"
+    },
+
+    {
+      title: "Scanea-me",
+      description: "E-commerce",
+      imgUrl: scaneame,
+      gitHub:"https://github.com/jonasojeda/scaneaMe",
+      deploy:"https://scaneame.vercel.app/home",
+      video:"#"
+    },
+    {
+      title: "ToDo App",
+      description: "Todo list",
+      imgUrl: todo_app,
+      gitHub:"https://github.com/jonasojeda/todo-app",
+      deploy:"https://jonas-dev-todo-app.netlify.app/",
+      video:"https://youtu.be/TaOhHlL7zVE"
     },
    
   ];
