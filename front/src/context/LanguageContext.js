@@ -1,8 +1,8 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const LanguageContext = createContext();
 
-const translations = {
+const defaultTranslations = {
   en: {
     nav: {
       home: "Home",
@@ -183,17 +183,41 @@ const translations = {
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('en'); // Default to English
+  
+  // Load translations from localStorage or use defaults
+  const [translations, setTranslations] = useState(() => {
+    const saved = localStorage.getItem('portfolio_translations');
+    return saved ? JSON.parse(saved) : defaultTranslations;
+  });
+
+  // Save to localStorage whenever translations change
+  useEffect(() => {
+    localStorage.setItem('portfolio_translations', JSON.stringify(translations));
+  }, [translations]);
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'es' ? 'en' : 'es');
   };
 
   const t = (section) => {
-    return translations[language][section];
+    return translations[language][section] || defaultTranslations[language][section];
+  };
+
+  const updateTranslation = (lang, section, key, value) => {
+    setTranslations(prev => ({
+      ...prev,
+      [lang]: {
+        ...prev[lang],
+        [section]: {
+          ...prev[lang][section],
+          [key]: value
+        }
+      }
+    }));
   };
 
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, t, translations, updateTranslation }}>
       {children}
     </LanguageContext.Provider>
   );
