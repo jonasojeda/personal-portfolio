@@ -4,6 +4,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
 import 'animate.css';
 import TrackVisibility from 'react-on-screen';
+import logo from '../assets/img/logo.png';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
@@ -44,6 +45,10 @@ export const Login = () => {
                         <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
                       </svg>
                       ACCESO RESTRINGIDO
+                    </div>
+
+                    <div className="text-center mb-4">
+                      <img src={logo} alt="Logo" style={{ maxHeight: '60px', width: 'auto', objectFit: 'contain' }} />
                     </div>
 
                     <h2>PANEL <span className="highlight-text">INTERNO</span></h2>
