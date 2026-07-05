@@ -1,10 +1,12 @@
 import { Container, Row, Col } from "react-bootstrap";
 
+import { useLanguage } from "../context/LanguageContext";
 import logo from "../assets/img/logo.png";
 import navIcon1 from '../assets/img/nav-icon1.svg';
 import navIcon2 from '../assets/img/github7.png';
 
 export const Footer = () => {
+  const { t } = useLanguage();
   return (
     <footer className="footer">
       <Container>
@@ -20,7 +22,7 @@ export const Footer = () => {
                 
               
             </div>
-            <p>Copyright 2022. All Rights Reserved</p>
+            <p>{t('footer').copyRight}</p>
           </Col>
         </Row>
       </Container>

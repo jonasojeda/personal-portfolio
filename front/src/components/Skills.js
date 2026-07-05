@@ -1,4 +1,5 @@
 import reac from "../assets/img/react.png";
+import { useLanguage } from "../context/LanguageContext";
 import node from "../assets/img/node.png";
 import js from "../assets/img/js.png";
 import html from "../assets/img/html.svg"
@@ -11,6 +12,7 @@ import 'react-multi-carousel/lib/styles.css';
 import colorSharp from "../assets/img/color-sharp.png"
 
 export const Skills = () => {
+  const { t } = useLanguage();
   const responsive = {
     superLargeDesktop: {
       // the naming can be any, depends on you.
@@ -37,8 +39,8 @@ export const Skills = () => {
             <div className="row">
                 <div className="col-12">
                     <div className="skill-bx wow zoomIn">
-                        <h2>Skills</h2>
-                        <p>My skills to highlight are:</p>
+                        <h2>{t('skills').title}</h2>
+                        <p>{t('skills').description}</p>
                         <Carousel responsive={responsive} infinite={true} className="owl-carousel owl-theme skill-slider">
                             <div className="item">
                                 <img src={reac} alt="Image" />

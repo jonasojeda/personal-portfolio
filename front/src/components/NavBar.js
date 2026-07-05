@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLanguage } from "../context/LanguageContext";
 import { Navbar, Nav, Container } from "react-bootstrap";
 import { AiFillGithub } from "react-icons/ai";
 import logo from '../assets/img/logo.png';
@@ -13,6 +14,7 @@ export const NavBar = () => {
 
   const [activeLink, setActiveLink] = useState('home');
   const [scrolled, setScrolled] = useState(false);
+  const { t, language, toggleLanguage } = useLanguage();
 
   useEffect(() => {
     const onScroll = () => {
@@ -44,9 +46,9 @@ export const NavBar = () => {
           </Navbar.Toggle>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link href="#home" className={activeLink === 'home' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('home')}>Home</Nav.Link>
-              <Nav.Link href="#skills" className={activeLink === 'skills' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('skills')}>Skills</Nav.Link>
-              <Nav.Link href="#project" className={activeLink === 'project' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('project')}>Projects</Nav.Link>
+              <Nav.Link href="#home" className={activeLink === 'home' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('home')}>{t('nav').home}</Nav.Link>
+              <Nav.Link href="#skills" className={activeLink === 'skills' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('skills')}>{t('nav').skills}</Nav.Link>
+              <Nav.Link href="#project" className={activeLink === 'project' ? 'active navbar-link' : 'navbar-link'} onClick={() => onUpdateActiveLink('project')}>{t('nav').projects}</Nav.Link>
             </Nav>
             <span className="navbar-text">
               <div className="social-icon">
@@ -55,8 +57,23 @@ export const NavBar = () => {
                 
               </div>
               <HashLink to='#connect'>
-                <button className="vvd"><span>Let’s Connect</span></button>
+                <button className="vvd"><span>{t('nav').connect}</span></button>
               </HashLink>
+              <button 
+                onClick={toggleLanguage} 
+                style={{
+                  background: 'transparent',
+                  color: 'white',
+                  border: '1px solid white',
+                  padding: '8px 12px',
+                  marginLeft: '15px',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                {language === 'es' ? 'EN' : 'ES'}
+              </button>
             </span>
           </Navbar.Collapse>
         </Container>

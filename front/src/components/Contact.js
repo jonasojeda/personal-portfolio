@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLanguage } from "../context/LanguageContext";
 import { Container, Row, Col } from "react-bootstrap";
 import emailjs from '@emailjs/browser'
 import contactImg from "../assets/img/contact-img.svg";
@@ -16,8 +17,9 @@ export const Contact = () => {
     phone: '',
     message: ''
   }
+  const { t } = useLanguage();
   const [formDetails, setFormDetails] = useState(formInitialDetails);
-  const [buttonText, setButtonText] = useState('Send');
+  const [buttonText, setButtonText] = useState(t('contact').send);
   const [status, setStatus] = useState({});
 
   const onFormUpdate = (category, value) => {
@@ -31,15 +33,15 @@ export const Contact = () => {
     e.preventDefault();
     
     if(formDetails.email && formDetails.firstName && formDetails.lastName && formDetails.message){
-      setButtonText("Sending...");
+      setButtonText(t('contact').sending);
       let res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn')
       
-      setButtonText("Send");
+      setButtonText(t('contact').send);
       setFormDetails(formInitialDetails);
       if (res.status == 200) {
-        setStatus({clas:'alert alert-success', succes: true, message: 'Message sent successfully'});
+        setStatus({clas:'alert alert-success', succes: true, message: t('contact').success});
       } else {
-        setStatus({ clas:'alert alert-danger', succes: false, message: 'Something went wrong, please try again later.'});
+        setStatus({ clas:'alert alert-danger', succes: false, message: t('contact').error});
       }
     }else{
       setStatus({clas:'alert alert-danger', succes: true, message: 'Please complete the required fields *.'});
@@ -64,23 +66,23 @@ export const Contact = () => {
             <TrackVisibility>
               {({ isVisible }) =>
                 <div className={isVisible ? "animate__animated animate__fadeIn" : ""}>
-                <h2>Get In Touch</h2>
+                <h2>{t('contact').title}</h2>
                 <form onSubmit={handleSubmit}>
                   <Row>
                     <Col size={12} sm={6} className="px-1">
-                      <input name="firstName" type="text" value={formDetails.firstName} placeholder="First Name *" onChange={(e) => onFormUpdate('firstName', e.target.value)} />
+                      <input name="firstName" type="text" value={formDetails.firstName} placeholder={`${t('contact').firstName} *`} onChange={(e) => onFormUpdate('firstName', e.target.value)} />
                     </Col>
                     <Col size={12} sm={6} className="px-1">
-                      <input name="lastName" type="text" value={formDetails.lastName} placeholder="Last Name *" onChange={(e) => onFormUpdate('lastName', e.target.value)}/>
+                      <input name="lastName" type="text" value={formDetails.lastName} placeholder={`${t('contact').lastName} *`} onChange={(e) => onFormUpdate('lastName', e.target.value)}/>
                     </Col>
                     <Col size={12} sm={6} className="px-1">
-                      <input name="email" type="email" value={formDetails.email} placeholder="Email Address *" onChange={(e) => onFormUpdate('email', e.target.value)} />
+                      <input name="email" type="email" value={formDetails.email} placeholder={`${t('contact').email} *`} onChange={(e) => onFormUpdate('email', e.target.value)} />
                     </Col>
                     <Col size={12} sm={6} className="px-1">
-                      <input name="phone" type="tel" value={formDetails.phone} placeholder="Phone No." onChange={(e) => onFormUpdate('phone', e.target.value)}/>
+                      <input name="phone" type="tel" value={formDetails.phone} placeholder={t('contact').phone} onChange={(e) => onFormUpdate('phone', e.target.value)}/>
                     </Col>
                     <Col size={12} className="px-1">
-                      <textarea name="message" rows="6" value={formDetails.message} placeholder="Message *" onChange={(e) => onFormUpdate('message', e.target.value)}></textarea>
+                      <textarea name="message" rows="6" value={formDetails.message} placeholder={`${t('contact').message} *`} onChange={(e) => onFormUpdate('message', e.target.value)}></textarea>
                       {
                       status.message &&
                         

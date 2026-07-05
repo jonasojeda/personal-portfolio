@@ -1,4 +1,5 @@
 import { Container, Row, Col, Tab, Nav } from "react-bootstrap";
+import { useLanguage } from "../context/LanguageContext";
 import { ProjectCard } from "./ProjectCard";
 import pokemon from "../assets/img/pokemon-app.png";
 import scaneame from "../assets/img/Scaneame.png";
@@ -8,6 +9,7 @@ import 'animate.css';
 import TrackVisibility from 'react-on-screen';
 
 export const Projects = () => {
+  const { t } = useLanguage();
 
   const projects = [
     {
@@ -46,8 +48,8 @@ export const Projects = () => {
             <TrackVisibility>
               {({ isVisible }) =>
               <div className={isVisible ? "animate__animated animate__fadeIn": ""}>
-                <h2>Projects</h2>
-                <p>My completed projects are:</p>
+                <h2>{t('projects').title}</h2>
+                <p>{t('projects').description}</p>
                 <Tab.Container id="projects-tabs" defaultActiveKey="first">
                   <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab">
                     

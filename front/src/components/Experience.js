@@ -1,26 +1,9 @@
 import { Container, Row, Col } from "react-bootstrap";
+import { useLanguage } from "../context/LanguageContext";
 
 export const Experience = () => {
-  const experiences = [
-    {
-      title: "Desarrollador Full Stack",
-      company: "Empresa Actual",
-      date: "2023 - Presente",
-      description: "Desarrollo y mantenimiento de aplicaciones web modernas. Participación en el ciclo completo de desarrollo de software, desde el diseño hasta el despliegue."
-    },
-    {
-      title: "Desarrollador Front-End Junior",
-      company: "Agencia Digital",
-      date: "2021 - 2023",
-      description: "Creación de interfaces de usuario interactivas y responsivas utilizando React y CSS. Colaboración estrecha con equipos de diseño."
-    },
-    {
-      title: "Estudiante de Ingeniería / Sistemas",
-      company: "Universidad Tecnológica",
-      date: "2018 - 2022",
-      description: "Formación académica en fundamentos de la computación, algoritmos, bases de datos y metodologías ágiles."
-    }
-  ];
+  const { t } = useLanguage();
+  const experiences = t('experience').roles;
 
   return (
     <section className="experience" id="experience">
@@ -28,8 +11,8 @@ export const Experience = () => {
         <Row>
           <Col size={12}>
             <div className="experience-bx wow zoomIn">
-              <h2>Experiencia Profesional</h2>
-              <p className="subtitle">Mi trayectoria en el desarrollo</p>
+              <h2>{t('experience').title}</h2>
+              <p className="subtitle">{t('experience').subtitle}</p>
               
               <div className="timeline">
                 {experiences.map((exp, index) => (

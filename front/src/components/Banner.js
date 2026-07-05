@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLanguage } from "../context/LanguageContext";
 import { Container, Row, Col } from "react-bootstrap";
 import headerImg from "../assets/img/header-img.png";
 import { ArrowRightCircle, Download, } from 'react-bootstrap-icons';
@@ -12,7 +13,8 @@ export const Banner = () => {
   const [text, setText] = useState('');
   const [delta, setDelta] = useState(300 - Math.random() * 100);
   const [index, setIndex] = useState(1);
-  const toRotate = [ "Jonas Ojeda","Web Developer" ];
+  const { t } = useLanguage();
+  const toRotate = t('banner').roles;
   const period = 2000;
 
   useEffect(() => {
@@ -56,9 +58,9 @@ export const Banner = () => {
             <TrackVisibility>
               {({ isVisible }) =>
               <div className={isVisible ? "animate__animated animate__fadeIn" : ""}>
-                <span className="tagline">Welcome to my Portfolio</span>
-                <h1>{`Hi! I'm`} <span className="txt-rotate" dataPeriod="1000" data-rotate='[ "Jonas Ojeda","Web Developer"]'><span className="wrap">{text}</span></span></h1>
-                  <p><strong>Hello, my name is Jonas. I am a curious person, constantly developing my skills. Prepared to face various challenges and seek solutions. In a work environment, for me the main pillars are commitment and responsibility.</strong></p>
+                <span className="tagline">{t('banner').tagline}</span>
+                <h1>{t('banner').greeting} <span className="txt-rotate" dataPeriod="1000" data-rotate='[ "Web Developer", "Full Stack Developer", "Backend Developer" ]'><span className="wrap">{text}</span></span></h1>
+                  <p><strong>{t('banner').description}</strong></p>
                   
                   {/* <HashLink to='#connect'> </HashLink> */}
                   <a href={cv} download='cv'> 
