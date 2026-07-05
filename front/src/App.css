@@ -619,3 +619,162 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   letter-spacing: 0.5px;
   margin-top: 20px;
 }
+
+/************ Experience Css ************/
+.experience {
+  padding: 80px 0;
+  position: relative;
+  background-color: black;
+}
+.experience-bx {
+  background: #151515;
+  border-radius: 64px;
+  padding: 60px 50px;
+  text-align: center;
+}
+.experience h2 {
+  font-size: 45px;
+  font-weight: 700;
+}
+.experience p.subtitle {
+  color: #B8B8B8;
+  font-size: 18px;
+  letter-spacing: 0.8px;
+  line-height: 1.5em;
+  margin: 14px 0 45px 0;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* The vertical line */
+.timeline::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -2px;
+  border-radius: 2px;
+}
+
+/* Timeline container */
+.timeline-container {
+  padding: 10px 40px;
+  position: relative;
+  background-color: inherit;
+  width: 50%;
+}
+
+/* The circles on the timeline */
+.timeline-container::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: -10px;
+  background: linear-gradient(90deg, rgba(5,43,124,1) 0%, rgba(69,186,252,1) 100%);
+  border: 4px solid #151515;
+  top: 25px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Place the container to the left */
+.left {
+  left: 0;
+  text-align: right;
+}
+
+/* Place the container to the right */
+.right {
+  left: 50%;
+  text-align: left;
+}
+
+/* Fix the circle for containers on the right side */
+.right::after {
+  left: -10px;
+}
+
+/* The actual content */
+.timeline-content {
+  padding: 20px 30px;
+  background-color: #1e1e1e;
+  position: relative;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease;
+  text-align: left;
+}
+.left .timeline-content {
+  text-align: right;
+}
+
+.timeline-content:hover {
+  transform: translateY(-5px);
+  border-color: rgba(69,186,252,0.5);
+}
+
+.timeline-content h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.timeline-content h4 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #45bafc;
+  margin-bottom: 10px;
+}
+
+.timeline-content .date {
+  font-size: 14px;
+  color: #B8B8B8;
+  display: block;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.timeline-content p {
+  color: #B8B8B8;
+  font-size: 16px;
+  line-height: 1.5em;
+  margin: 0 !important;
+  text-align: inherit;
+}
+
+/* Media queries - Responsive timeline on screens less than 768px wide */
+@media screen and (max-width: 768px) {
+  .timeline::after {
+    left: 31px;
+  }
+  
+  .timeline-container {
+    width: 100%;
+    padding-left: 70px;
+    padding-right: 25px;
+    text-align: left;
+  }
+  
+  .left::after, .right::after {
+    left: 21px;
+  }
+  
+  .right {
+    left: 0%;
+  }
+
+  .left .timeline-content, .right .timeline-content {
+    text-align: left;
+  }
+}
+
