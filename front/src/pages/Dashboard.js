@@ -84,9 +84,9 @@ export const Dashboard = () => {
         <aside className={`sidebar-full ${sidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-header" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
             {sidebarOpen ? (
-              <img src={logo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '40px', width: 'auto', objectFit: 'contain' }} />
+              <img src={logo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '80px', width: 'auto', objectFit: 'contain' }} />
             ) : (
-              <img src={logo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '30px', width: 'auto', objectFit: 'contain' }} />
+              <img src={logo} alt="Logo" style={{ maxWidth: '100%', maxHeight: '50px', width: 'auto', objectFit: 'contain' }} />
             )}
           </div>
 

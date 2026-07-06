@@ -48,7 +48,7 @@ export const Login = () => {
                     </div>
 
                     <div className="text-center mb-4">
-                      <img src={logo} alt="Logo" style={{ maxHeight: '60px', width: 'auto', objectFit: 'contain' }} />
+                      <img src={logo} alt="Logo" style={{ maxHeight: '100px', width: 'auto', objectFit: 'contain' }} />
                     </div>
 
                     <h2>PANEL <span className="highlight-text">INTERNO</span></h2>
