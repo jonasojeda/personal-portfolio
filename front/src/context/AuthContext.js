@@ -1,5 +1,5 @@
 import { createContext, useState, useContext } from 'react';
-import axios from 'axios';
+import { authApi } from '../api';
 
 const AuthContext = createContext();
 
@@ -14,8 +14,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null);
-      // Change this URL if your Laravel API is hosted on a different port/domain
-      const response = await axios.post('http://127.0.0.1:8000/api/login', {
+      const response = await authApi.login({
         email,
         password
       });

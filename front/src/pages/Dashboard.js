@@ -66,8 +66,229 @@ export const Dashboard = () => {
     });
   };
 
+  const renderHeroEditor = () => {
+    const bannerEn = translations['en']['banner'] || {};
+    const bannerEs = translations['es']['banner'] || {};
+
+    const handleFieldChange = (lang, key, value) => {
+      updateTranslation(lang, 'banner', key, value);
+    };
+
+    const handleRoleChange = (lang, index, value) => {
+      const currentRoles = [...(lang === 'en' ? bannerEn.roles : bannerEs.roles)];
+      currentRoles[index] = value;
+      updateTranslation(lang, 'banner', 'roles', currentRoles);
+    };
+
+    const addRole = (lang) => {
+      const currentRoles = [...(lang === 'en' ? bannerEn.roles : bannerEs.roles)];
+      currentRoles.push('');
+      updateTranslation(lang, 'banner', 'roles', currentRoles);
+    };
+
+    const removeRole = (lang, index) => {
+      const currentRoles = [...(lang === 'en' ? bannerEn.roles : bannerEs.roles)];
+      if (currentRoles.length > 1) {
+        currentRoles.splice(index, 1);
+        updateTranslation(lang, 'banner', 'roles', currentRoles);
+      }
+    };
+
+    return (
+      <div className="hero-config-form">
+        {/* Row for basic string fields */}
+        <div className="dashboard-subsection mb-5">
+          <h5 className="subsection-title">Información Principal / Main Info</h5>
+          <p className="subsection-desc">Configura los textos principales que aparecen estáticos en tu banner de presentación.</p>
+          
+          {/* Tagline */}
+          <div className="dashboard-edit-group mb-4">
+            <label className="dashboard-label">TAGLINE</label>
+            <Row>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">EN</span>
+                  <input
+                    type="text"
+                    className="dashboard-input"
+                    value={bannerEn.tagline || ''}
+                    onChange={(e) => handleFieldChange('en', 'tagline', e.target.value)}
+                  />
+                </div>
+              </Col>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">ES</span>
+                  <input
+                    type="text"
+                    className="dashboard-input"
+                    value={bannerEs.tagline || ''}
+                    onChange={(e) => handleFieldChange('es', 'tagline', e.target.value)}
+                  />
+                </div>
+              </Col>
+            </Row>
+          </div>
+
+          {/* Greeting */}
+          <div className="dashboard-edit-group mb-4">
+            <label className="dashboard-label">GREETING / SALUDO</label>
+            <Row>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">EN</span>
+                  <input
+                    type="text"
+                    className="dashboard-input"
+                    value={bannerEn.greeting || ''}
+                    onChange={(e) => handleFieldChange('en', 'greeting', e.target.value)}
+                  />
+                </div>
+              </Col>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">ES</span>
+                  <input
+                    type="text"
+                    className="dashboard-input"
+                    value={bannerEs.greeting || ''}
+                    onChange={(e) => handleFieldChange('es', 'greeting', e.target.value)}
+                  />
+                </div>
+              </Col>
+            </Row>
+          </div>
+
+          {/* Description */}
+          <div className="dashboard-edit-group mb-4">
+            <label className="dashboard-label">DESCRIPTION / DESCRIPCIÓN</label>
+            <Row>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">EN</span>
+                  <textarea
+                    className="dashboard-input"
+                    value={bannerEn.description || ''}
+                    onChange={(e) => handleFieldChange('en', 'description', e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </Col>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">ES</span>
+                  <textarea
+                    className="dashboard-input"
+                    value={bannerEs.description || ''}
+                    onChange={(e) => handleFieldChange('es', 'description', e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </Col>
+            </Row>
+          </div>
+
+          {/* Connect / CTA Button Text */}
+          <div className="dashboard-edit-group mb-4">
+            <label className="dashboard-label">CONNECT BUTTON / BOTÓN CONECTAR</label>
+            <Row>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">EN</span>
+                  <input
+                    type="text"
+                    className="dashboard-input"
+                    value={bannerEn.connect || ''}
+                    onChange={(e) => handleFieldChange('en', 'connect', e.target.value)}
+                  />
+                </div>
+              </Col>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">ES</span>
+                  <input
+                    type="text"
+                    className="dashboard-input"
+                    value={bannerEs.connect || ''}
+                    onChange={(e) => handleFieldChange('es', 'connect', e.target.value)}
+                  />
+                </div>
+              </Col>
+            </Row>
+          </div>
+        </div>
+
+        {/* Roles Section */}
+        <div className="dashboard-subsection mt-5">
+          <h5 className="subsection-title">Roles de Rotación / Rotating Roles</h5>
+          <p className="subsection-desc">Configura los títulos profesionales que cambian con la animación de escritura en la cabecera.</p>
+          
+          <Row>
+            {/* English Roles */}
+            <Col md={6}>
+              <div className="roles-column-box p-3 mb-4">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <span className="lang-badge bg-primary">EN - English</span>
+                  <button className="btn-modern-small-success" onClick={() => addRole('en')}>+ Add Role</button>
+                </div>
+                {(bannerEn.roles || []).map((role, idx) => (
+                  <div key={idx} className="input-container-modern mb-2 d-flex align-items-center">
+                    <input
+                      type="text"
+                      className="dashboard-input flex-grow-1"
+                      value={role}
+                      onChange={(e) => handleRoleChange('en', idx, e.target.value)}
+                      placeholder={`Role #${idx + 1}`}
+                    />
+                    {(bannerEn.roles || []).length > 1 && (
+                      <button className="btn-role-delete ms-2" onClick={() => removeRole('en', idx)} title="Remove role">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                          <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Col>
+
+            {/* Spanish Roles */}
+            <Col md={6}>
+              <div className="roles-column-box p-3 mb-4">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <span className="lang-badge bg-warning text-dark">ES - Español</span>
+                  <button className="btn-modern-small-success" onClick={() => addRole('es')}>+ Añadir Rol</button>
+                </div>
+                {(bannerEs.roles || []).map((role, idx) => (
+                  <div key={idx} className="input-container-modern mb-2 d-flex align-items-center">
+                    <input
+                      type="text"
+                      className="dashboard-input flex-grow-1"
+                      value={role}
+                      onChange={(e) => handleRoleChange('es', idx, e.target.value)}
+                      placeholder={`Rol #${idx + 1}`}
+                    />
+                    {(bannerEs.roles || []).length > 1 && (
+                      <button className="btn-role-delete ms-2" onClick={() => removeRole('es', idx)} title="Eliminar rol">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                          <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
-    { id: 'banner', name: 'Banner' },
+    { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
     { id: 'experience', name: 'Experience' },
     { id: 'projects', name: 'Projects' },
@@ -151,7 +372,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>
