@@ -30,4 +30,9 @@ export const authApi = {
   deleteTokens: () => api.delete('/tokens'),
 };
 
+export const heroApi = {
+  getHero: () => api.get('/hero'),
+  updateHero: (data: any) => api.put('/hero', data),
+};
+
 export default api;

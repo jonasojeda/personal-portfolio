@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AccessTokenController;
+use App\Http\Controllers\HeroSectionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('tokens', [AccessTokenController::class, 'index']); // Kept from original
 Route::delete('tokens', [AccessTokenController::class, 'destroyAll']); // Kept from original
 Route::post('login', [AccessTokenController::class, 'store']); // Kept from original
+
+Route::get('hero', [HeroSectionController::class, 'index']);
+Route::middleware('auth:sanctum')->put('hero', [HeroSectionController::class, 'update']);
