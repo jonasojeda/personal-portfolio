@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { cvApi, skillsApi, experienceApi, projectApi, blogApi } from '../api';
+import { cvApi, skillsApi, experienceApi, projectApi, blogApi, contactApi } from '../api';
 
 
 export const Dashboard = () => {
@@ -30,11 +30,15 @@ export const Dashboard = () => {
   const [blogsEs, setBlogsEs] = useState([]);
   const [loadingBlog, setLoadingBlog] = useState(false);
 
+  const [contactMessages, setContactMessages] = useState([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
+
   useEffect(() => {
     fetchSkills();
     fetchExperiences();
     fetchProjects();
     fetchBlogs();
+    fetchContactMessages();
   }, []);
 
   const fetchBlogs = async () => {
@@ -48,6 +52,30 @@ export const Dashboard = () => {
       console.error('Error fetching blogs:', err);
     } finally {
       setLoadingBlog(false);
+    }
+  };
+
+  const fetchContactMessages = async () => {
+    try {
+      setLoadingContacts(true);
+      const res = await contactApi.getMessages();
+      setContactMessages(res.data);
+    } catch (err) {
+      console.error('Error fetching contact messages:', err);
+    } finally {
+      setLoadingContacts(false);
+    }
+  };
+
+  const deleteContactMessage = async (id) => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este mensaje?')) return;
+    try {
+      await contactApi.deleteMessage(id);
+      setContactMessages(contactMessages.filter(msg => msg.id !== id));
+      alert('Mensaje de contacto eliminado.');
+    } catch (err) {
+      console.error('Error deleting contact message:', err);
+      alert('Error al eliminar el mensaje.');
     }
   };
 
@@ -972,6 +1000,81 @@ export const Dashboard = () => {
     );
   };
 
+  const renderContactEditor = () => {
+    return (
+      <div className="contact-editor-container">
+        <div className="dashboard-subsection mb-5">
+          <h5 className="subsection-title" style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '10px' }}>Traducciones de la Sección</h5>
+          <p className="subsection-desc" style={{ color: '#888', fontSize: '0.9rem', marginBottom: '20px' }}>Modifica los textos y etiquetas del formulario de contacto.</p>
+          {renderStringEditor('contact')}
+        </div>
+
+        <hr className="my-5" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+
+        <div className="dashboard-subsection">
+          <h5 className="subsection-title" style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '10px' }}>Mensajes de Contacto Recibidos</h5>
+          <p className="subsection-desc" style={{ color: '#888', fontSize: '0.9rem', marginBottom: '20px' }}>Visualiza y gestiona las solicitudes de contacto enviadas por los usuarios.</p>
+          {loadingContacts ? (
+            <p className="text-white">Cargando mensajes...</p>
+          ) : contactMessages.length === 0 ? (
+            <p className="text-muted">No se han recibido mensajes de contacto.</p>
+          ) : (
+            <div className="table-responsive" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+              <table className="table table-dark table-striped table-bordered align-middle text-white" style={{ backgroundColor: '#1a1e23', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#111' }}>
+                    <th style={{ padding: '12px' }}>Nombre</th>
+                    <th style={{ padding: '12px' }}>Email</th>
+                    <th style={{ padding: '12px' }}>Teléfono</th>
+                    <th style={{ padding: '12px' }}>Mensaje</th>
+                    <th style={{ padding: '12px' }}>Fecha</th>
+                    <th style={{ padding: '12px' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contactMessages.map(msg => (
+                    <tr key={msg.id}>
+                      <td style={{ fontWeight: '600', padding: '12px' }}>{msg.first_name} {msg.last_name}</td>
+                      <td style={{ padding: '12px' }}>
+                        <a href={`mailto:${msg.email}`} style={{ color: '#45bafc', textDecoration: 'none' }}>
+                          {msg.email}
+                        </a>
+                      </td>
+                      <td style={{ padding: '12px' }}>{msg.phone || '-'}</td>
+                      <td style={{ whiteSpace: 'pre-wrap', minWidth: '200px', maxWidth: '300px', padding: '12px' }}>{msg.message}</td>
+                      <td style={{ padding: '12px', fontSize: '0.85rem' }}>{new Date(msg.created_at).toLocaleString()}</td>
+                      <td style={{ padding: '12px' }}>
+                        <button 
+                          className="btn-modern-small-danger" 
+                          onClick={() => deleteContactMessage(msg.id)}
+                          style={{
+                            padding: '6px 12px',
+                            backgroundColor: '#dc3545',
+                            border: 'none',
+                            borderRadius: '4px',
+                            color: '#fff',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            transition: 'background-color 0.2s'
+                          }}
+                          onMouseOver={(e) => e.target.style.backgroundColor = '#bd2130'}
+                          onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
     { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
@@ -1057,7 +1160,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : sec.id === 'blog' ? renderBlogEditor() : renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : sec.id === 'blog' ? renderBlogEditor() : sec.id === 'contact' ? renderContactEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>

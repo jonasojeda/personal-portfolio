@@ -28,6 +28,7 @@ Route::get('skills', [\App\Http\Controllers\SkillCategoryController::class, 'ind
 Route::get('experiences/{lang?}', [\App\Http\Controllers\ExperienceController::class, 'index']);
 Route::get('projects/{lang?}', [\App\Http\Controllers\ProjectController::class, 'index']);
 Route::get('blogs/{lang?}', [\App\Http\Controllers\BlogController::class, 'index']);
+Route::post('contacts', [\App\Http\Controllers\ContactMessageController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('hero', [HeroSectionController::class, 'update']);
@@ -54,4 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('blogs', [\App\Http\Controllers\BlogController::class, 'store']);
     Route::put('blogs/{id}', [\App\Http\Controllers\BlogController::class, 'update']);
     Route::delete('blogs/{id}', [\App\Http\Controllers\BlogController::class, 'destroy']);
+
+    // Contact Messages Management
+    Route::get('contacts', [\App\Http\Controllers\ContactMessageController::class, 'index']);
+    Route::delete('contacts/{id}', [\App\Http\Controllers\ContactMessageController::class, 'destroy']);
 });

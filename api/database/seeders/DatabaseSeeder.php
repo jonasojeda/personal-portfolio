@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ExperienceSeeder::class,
             ProjectSeeder::class,
             BlogSeeder::class,
+            ContactMessageSeeder::class,
         ]);
         // \App\Models\User::factory(10)->create();
 

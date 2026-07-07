@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLanguage } from "../context/LanguageContext";
+import { contactApi } from "../api";
 import { Container, Row, Col } from "react-bootstrap";
 import emailjs from '@emailjs/browser'
 import contactImg from "../assets/img/contact-img.svg";
@@ -34,11 +35,32 @@ export const Contact = () => {
     
     if(formDetails.email && formDetails.firstName && formDetails.lastName && formDetails.message){
       setButtonText(t('contact').sending);
-      let res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn')
+      
+      let backendSuccess = false;
+      try {
+        await contactApi.submitMessage({
+          first_name: formDetails.firstName,
+          last_name: formDetails.lastName,
+          email: formDetails.email,
+          phone: formDetails.phone || null,
+          message: formDetails.message
+        });
+        backendSuccess = true;
+      } catch (err) {
+        console.error("Error saving message to database:", err);
+      }
+
+      let res;
+      try {
+        res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn');
+      } catch (err) {
+        console.error("Error sending email via EmailJS:", err);
+      }
       
       setButtonText(t('contact').send);
       setFormDetails(formInitialDetails);
-      if (res.status == 200) {
+
+      if (backendSuccess || (res && res.status === 200)) {
         setStatus({clas:'alert alert-success', succes: true, message: t('contact').success});
       } else {
         setStatus({ clas:'alert alert-danger', succes: false, message: t('contact').error});
@@ -46,9 +68,6 @@ export const Contact = () => {
     }else{
       setStatus({clas:'alert alert-danger', succes: true, message: 'Please complete the required fields *.'});
     }
-
-    
-
   };
 
   return (
