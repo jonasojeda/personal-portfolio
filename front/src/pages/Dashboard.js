@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { cvApi, skillsApi, experienceApi, projectApi } from '../api';
+import { cvApi, skillsApi, experienceApi, projectApi, blogApi } from '../api';
 
 
 export const Dashboard = () => {
@@ -26,11 +26,30 @@ export const Dashboard = () => {
   const [projectsEs, setProjectsEs] = useState([]);
   const [loadingProj, setLoadingProj] = useState(false);
 
+  const [blogsEn, setBlogsEn] = useState([]);
+  const [blogsEs, setBlogsEs] = useState([]);
+  const [loadingBlog, setLoadingBlog] = useState(false);
+
   useEffect(() => {
     fetchSkills();
     fetchExperiences();
     fetchProjects();
+    fetchBlogs();
   }, []);
+
+  const fetchBlogs = async () => {
+    try {
+      setLoadingBlog(true);
+      const resEn = await blogApi.getBlogs('en');
+      const resEs = await blogApi.getBlogs('es');
+      setBlogsEn(resEn.data);
+      setBlogsEs(resEs.data);
+    } catch (err) {
+      console.error('Error fetching blogs:', err);
+    } finally {
+      setLoadingBlog(false);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -822,11 +841,143 @@ export const Dashboard = () => {
     );
   };
 
+  const renderBlogEditor = () => {
+    const handleBlogChange = (lang, index, field, value) => {
+      const arr = lang === 'en' ? [...blogsEn] : [...blogsEs];
+      arr[index][field] = value;
+      if (lang === 'en') setBlogsEn(arr);
+      else setBlogsEs(arr);
+    };
+
+    const handleImageUpload = async (e, lang, index) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('image', file);
+      try {
+        const res = await blogApi.uploadImage(formData);
+        handleBlogChange(lang, index, 'cover_image', res.data.url);
+      } catch (err) {
+        console.error(err);
+        alert('Error uploading image');
+      }
+    };
+
+    const saveBlog = async (lang, index) => {
+      try {
+        const arr = lang === 'en' ? blogsEn : blogsEs;
+        const blog = arr[index];
+        if (blog.id) {
+          await blogApi.updateBlog(blog.id, blog);
+        } else {
+          const res = await blogApi.createBlog({ ...blog, lang });
+          const newArray = [...arr];
+          newArray[index] = res.data;
+          if (lang === 'en') setBlogsEn(newArray);
+          else setBlogsEs(newArray);
+        }
+        alert('Blog saved successfully!');
+      } catch (err) {
+        console.error(err);
+        alert('Error saving blog');
+      }
+    };
+
+    const deleteBlog = async (lang, index) => {
+      if (!window.confirm('Are you sure you want to delete this blog post?')) return;
+      try {
+        const arr = lang === 'en' ? blogsEn : blogsEs;
+        const blog = arr[index];
+        if (blog.id) {
+          await blogApi.deleteBlog(blog.id);
+        }
+        const newArray = [...arr];
+        newArray.splice(index, 1);
+        if (lang === 'en') setBlogsEn(newArray);
+        else setBlogsEs(newArray);
+      } catch (err) {
+        console.error(err);
+        alert('Error deleting blog');
+      }
+    };
+
+    const addNewBlog = (lang) => {
+      const newBlog = { lang, title: '', excerpt: '', content: '', cover_image: '', author_name: '', order_index: 0, published_at: new Date().toISOString().split('T')[0] };
+      if (lang === 'en') setBlogsEn([...blogsEn, newBlog]);
+      else setBlogsEs([...blogsEs, newBlog]);
+    };
+
+    const renderColumn = (lang, blogs) => (
+      <Col md={12} lg={6}>
+        <div className="roles-column-box p-3 mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <span className={`lang-badge ${lang === 'en' ? 'bg-primary' : 'bg-warning text-dark'}`}>
+              {lang === 'en' ? 'EN - English' : 'ES - Español'}
+            </span>
+            <button className="btn-modern-small-success" onClick={() => addNewBlog(lang)}>+ Añadir Post</button>
+          </div>
+          {loadingBlog ? <p className="text-white">Loading...</p> : blogs.map((blog, idx) => (
+            <div key={idx} className="dashboard-edit-group mb-4 p-3 border border-secondary rounded">
+              <label className="dashboard-label">TÍTULO DEL POST</label>
+              <input type="text" className="dashboard-input w-100 mb-2" value={blog.title || ''} onChange={(e) => handleBlogChange(lang, idx, 'title', e.target.value)} />
+              
+              <label className="dashboard-label">RESUMEN CORTO (Excerpt)</label>
+              <textarea className="dashboard-input w-100 mb-2" rows="2" value={blog.excerpt || ''} onChange={(e) => handleBlogChange(lang, idx, 'excerpt', e.target.value)} />
+              
+              <label className="dashboard-label">IMAGEN DE PORTADA</label>
+              <div className="d-flex mb-3 gap-2">
+                <input type="text" className="dashboard-input flex-grow-1" placeholder="URL o subir imagen ->" value={blog.cover_image || ''} onChange={(e) => handleBlogChange(lang, idx, 'cover_image', e.target.value)} />
+                <input type="file" className="form-control bg-dark text-white border-0" style={{ maxWidth: '150px' }} accept="image/*" onChange={(e) => handleImageUpload(e, lang, idx)} />
+              </div>
+
+              <Row>
+                <Col md={6}>
+                  <label className="dashboard-label">AUTOR</label>
+                  <input type="text" className="dashboard-input w-100 mb-2" value={blog.author_name || ''} onChange={(e) => handleBlogChange(lang, idx, 'author_name', e.target.value)} />
+                </Col>
+                <Col md={6}>
+                  <label className="dashboard-label">FECHA (YYYY-MM-DD)</label>
+                  <input type="date" className="dashboard-input w-100 mb-2" value={blog.published_at ? blog.published_at.substring(0, 10) : ''} onChange={(e) => handleBlogChange(lang, idx, 'published_at', e.target.value)} />
+                </Col>
+              </Row>
+
+              <label className="dashboard-label mt-2">CONTENIDO DEL POST (Soporta Markdown)</label>
+              <div className="text-muted small mb-2">Puedes usar sintaxis Markdown para formatear el texto. Ejemplo: **negrita**, # Título grande, - lista.</div>
+              <textarea className="dashboard-input w-100 mb-3" rows="15" value={blog.content || ''} onChange={(e) => handleBlogChange(lang, idx, 'content', e.target.value)} style={{ fontFamily: 'monospace' }} />
+
+              <label className="dashboard-label">ORDEN</label>
+              <input type="number" className="dashboard-input w-100 mb-3" value={blog.order_index || 0} onChange={(e) => handleBlogChange(lang, idx, 'order_index', parseInt(e.target.value))} />
+
+              <div className="d-flex justify-content-end mt-3">
+                <button className="btn-modern-small-danger me-2" onClick={() => deleteBlog(lang, idx)}>Eliminar</button>
+                <button className="btn-modern-outline" onClick={() => saveBlog(lang, idx)}>Guardar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Col>
+    );
+
+    return (
+      <div className="hero-config-form">
+        <div className="dashboard-subsection mb-5">
+          <h5 className="subsection-title">Gestión del Blog</h5>
+          <p className="subsection-desc">Edita tus posts bilingües. Usa sintaxis Markdown para el contenido largo (soporta código, negritas, links, etc.).</p>
+          <Row>
+            {renderColumn('en', blogsEn)}
+            {renderColumn('es', blogsEs)}
+          </Row>
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
     { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
     { id: 'experience', name: 'Experience' },
     { id: 'projects', name: 'Projects' },
+    { id: 'blog', name: 'Blog' },
     { id: 'blog', name: 'Blog' },
     { id: 'contact', name: 'Contact' },
     { id: 'footer', name: 'Footer' },
@@ -907,7 +1058,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : sec.id === 'blog' ? renderBlogEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>

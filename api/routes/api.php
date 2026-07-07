@@ -27,6 +27,7 @@ Route::get('hero', [HeroSectionController::class, 'index']);
 Route::get('skills', [\App\Http\Controllers\SkillCategoryController::class, 'index']);
 Route::get('experiences/{lang?}', [\App\Http\Controllers\ExperienceController::class, 'index']);
 Route::get('projects/{lang?}', [\App\Http\Controllers\ProjectController::class, 'index']);
+Route::get('blogs/{lang?}', [\App\Http\Controllers\BlogController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('hero', [HeroSectionController::class, 'update']);
@@ -47,4 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('projects', [\App\Http\Controllers\ProjectController::class, 'store']);
     Route::put('projects/{id}', [\App\Http\Controllers\ProjectController::class, 'update']);
     Route::delete('projects/{id}', [\App\Http\Controllers\ProjectController::class, 'destroy']);
+
+    // Blog Management
+    Route::post('blogs/upload-image', [\App\Http\Controllers\BlogController::class, 'uploadImage']);
+    Route::post('blogs', [\App\Http\Controllers\BlogController::class, 'store']);
+    Route::put('blogs/{id}', [\App\Http\Controllers\BlogController::class, 'update']);
+    Route::delete('blogs/{id}', [\App\Http\Controllers\BlogController::class, 'destroy']);
 });

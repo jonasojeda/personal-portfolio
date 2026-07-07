@@ -77,4 +77,14 @@ export const projectApi = {
   })
 };
 
+export const blogApi = {
+  getBlogs: (lang?: string) => api.get(`/blogs${lang ? `/${lang}` : ''}`),
+  createBlog: (data: any) => api.post('/blogs', data),
+  updateBlog: (id: number, data: any) => api.put(`/blogs/${id}`, data),
+  deleteBlog: (id: number) => api.delete(`/blogs/${id}`),
+  uploadImage: (formData: FormData) => api.post('/blogs/upload-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+};
+
 export default api;
