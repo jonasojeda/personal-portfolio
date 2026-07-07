@@ -25,3 +25,4 @@ Route::post('login', [AccessTokenController::class, 'store']); // Kept from orig
 
 Route::get('hero', [HeroSectionController::class, 'index']);
 Route::middleware('auth:sanctum')->put('hero', [HeroSectionController::class, 'update']);
+Route::middleware('auth:sanctum')->post('cv', [\App\Http\Controllers\CVController::class, 'upload']);

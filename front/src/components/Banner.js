@@ -6,14 +6,15 @@ import { ArrowRightCircle, Download, } from 'react-bootstrap-icons';
 import { HashLink } from 'react-router-hash-link';
 import 'animate.css';
 import TrackVisibility from 'react-on-screen';
-import cv from '../assets/cv.pdf'
 export const Banner = () => {
+  const { t, language } = useLanguage();
+  const baseUrl = (process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api').replace(/\/api$/, '');
+  const cvUrl = `${baseUrl}/storage/cv_${language || 'en'}.pdf`;
   const [loopNum, setLoopNum] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [text, setText] = useState('');
   const [delta, setDelta] = useState(300 - Math.random() * 100);
   const [index, setIndex] = useState(1);
-  const { t } = useLanguage();
   const toRotate = t('banner').roles;
   const period = 2000;
 
@@ -63,7 +64,7 @@ export const Banner = () => {
                   <p><strong>{t('banner').description}</strong></p>
                   
                   {/* <HashLink to='#connect'> </HashLink> */}
-                  <a href={cv} download='cv'> 
+                  <a href={cvUrl} download='cv' target="_blank" rel="noreferrer"> 
                   <button>Download CV<Download size={25} /></button>
                   </a>
                   

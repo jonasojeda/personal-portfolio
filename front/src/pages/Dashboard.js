@@ -4,12 +4,37 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
+import { cvApi } from '../api';
+
 
 export const Dashboard = () => {
   const { translations, updateTranslation } = useLanguage();
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [cvUploadStatusEn, setCvUploadStatusEn] = useState('');
+  const [cvUploadStatusEs, setCvUploadStatusEs] = useState('');
+
+  const handleCVUpload = async (e, lang) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('cv', file);
+    formData.append('lang', lang);
+
+    const setStatus = lang === 'en' ? setCvUploadStatusEn : setCvUploadStatusEs;
+
+    setStatus('Uploading...');
+    try {
+      await cvApi.uploadCV(formData);
+      setStatus('CV uploaded successfully!');
+      setTimeout(() => setStatus(''), 3000);
+    } catch (err) {
+      console.error(err);
+      setStatus('Error uploading CV.');
+    }
+  };
 
   const handleSave = (lang, section, key, value) => {
     updateTranslation(lang, section, key, value);
@@ -213,6 +238,37 @@ export const Dashboard = () => {
                     onChange={(e) => handleFieldChange('es', 'connect', e.target.value)}
                   />
                 </div>
+              </Col>
+            </Row>
+          </div>
+          
+          {/* CV Upload */}
+          <div className="dashboard-edit-group mb-4">
+            <label className="dashboard-label">CURRICULUM VITAE (PDF)</label>
+            <Row>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">EN</span>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="dashboard-input"
+                    onChange={(e) => handleCVUpload(e, 'en')}
+                  />
+                </div>
+                {cvUploadStatusEn && <p className={`mt-2 ${cvUploadStatusEn.includes('Error') ? 'text-danger' : 'text-success'}`}>{cvUploadStatusEn}</p>}
+              </Col>
+              <Col md={6}>
+                <div className="input-container-modern mb-2">
+                  <span className="lang-badge">ES</span>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="dashboard-input"
+                    onChange={(e) => handleCVUpload(e, 'es')}
+                  />
+                </div>
+                {cvUploadStatusEs && <p className={`mt-2 ${cvUploadStatusEs.includes('Error') ? 'text-danger' : 'text-success'}`}>{cvUploadStatusEs}</p>}
               </Col>
             </Row>
           </div>

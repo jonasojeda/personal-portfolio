@@ -35,4 +35,22 @@ export const heroApi = {
   updateHero: (data: any) => api.put('/hero', data),
 };
 
+export const cvApi = {
+  uploadCV: async (data: any) => {
+    const token = localStorage.getItem('token');
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
+    const response = await fetch(`${baseUrl}/cv`, {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+    return response.json();
+  }
+};
+
 export default api;
