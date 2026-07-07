@@ -77,10 +77,10 @@ export const Blog = () => {
       </Container>
       
       {/* Article Modal */}
-      <Modal show={showModal} onHide={handleClose} fullscreen className="blog-modal">
+      <Modal show={showModal} onHide={handleClose} size="lg" centered className="blog-modal">
         <Modal.Header closeButton closeVariant="white" style={{ backgroundColor: '#121212', borderBottom: 'none' }}>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: '#121212', color: '#E0E0E0', padding: '0 20px 60px 20px' }}>
+        <Modal.Body style={{ backgroundColor: '#121212', color: '#E0E0E0', padding: '0 30px 40px 30px' }}>
           {selectedArticle && (
             <Container className="blog-reading-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
               <button 
@@ -88,7 +88,7 @@ export const Blog = () => {
                 className="btn-modern-outline mb-4 d-flex align-items-center"
                 style={{ border: '1px solid rgba(255, 255, 255, 0.2)', color: '#fff', padding: '8px 20px', borderRadius: '50px', background: 'transparent' }}
               >
-                <ArrowLeft className="me-2" /> {language === 'es' ? 'Volver al Inicio' : 'Back to Home'}
+                <ArrowLeft className="me-2" /> {language === 'es' ? 'Cerrar' : 'Close'}
               </button>
 
               <h1 className="blog-title mb-4" style={{ color: '#fff', fontSize: '3rem', fontWeight: 'bold' }}>{selectedArticle.title}</h1>
@@ -124,7 +124,7 @@ export const Blog = () => {
                   className="btn-modern-outline d-flex align-items-center"
                   style={{ border: '1px solid rgba(255, 255, 255, 0.2)', color: '#fff', padding: '10px 24px', borderRadius: '50px', background: 'transparent' }}
                 >
-                  <ArrowLeft className="me-2" /> {language === 'es' ? 'Volver al Inicio' : 'Back to Home'}
+                  <ArrowLeft className="me-2" /> {language === 'es' ? 'Cerrar' : 'Close'}
                 </button>
               </div>
             </Container>
