@@ -1,85 +1,70 @@
-import reac from "../assets/img/react.png";
 import { useLanguage } from "../context/LanguageContext";
-import node from "../assets/img/node.png";
-import js from "../assets/img/js.png";
-import html from "../assets/img/html.svg"
-import css from "../assets/img/css.png"
-import tailwind from "../assets/img/tailwind.png"
-import express from "../assets/img/express.png"
-import mysql from "../assets/img/MySQL.png"
-import Carousel from 'react-multi-carousel';
-import 'react-multi-carousel/lib/styles.css';
-import colorSharp from "../assets/img/color-sharp.png"
+import { FiServer, FiDatabase, FiCloud, FiCode, FiLock, FiZap } from "react-icons/fi";
 
 export const Skills = () => {
   const { t } = useLanguage();
-  const responsive = {
-    superLargeDesktop: {
-      // the naming can be any, depends on you.
-      breakpoint: { max: 4000, min: 3000 },
-      items: 5
+  
+  // Use translations if available, otherwise fallback to static text
+  const sectionTitle = t('skills') && t('skills').title ? t('skills').title : "Skills & ";
+  const sectionDesc = t('skills') && t('skills').description ? t('skills').description : "Herramientas y tecnologías que domino para construir soluciones backend robustas";
+
+  const skillCategories = [
+    {
+      title: "Backend Development",
+      icon: <FiServer className="skill-icon" />,
+      skills: ["Node.js", "Python", "Java", "PHP", "Ruby"]
     },
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 3
+    {
+      title: "Databases",
+      icon: <FiDatabase className="skill-icon" />,
+      skills: ["PostgreSQL", "MongoDB", "MySQL", "Redis", "Firebase"]
     },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 2
+    {
+      title: "Cloud & DevOps",
+      icon: <FiCloud className="skill-icon" />,
+      skills: ["AWS", "Docker", "Kubernetes", "CI/CD", "Terraform"]
     },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1
+    {
+      title: "APIs & Frameworks",
+      icon: <FiCode className="skill-icon" />,
+      skills: ["Express", "Django", "FastAPI", "GraphQL", "REST"]
+    },
+    {
+      title: "Security",
+      icon: <FiLock className="skill-icon" />,
+      skills: ["OAuth", "JWT", "SSL/TLS", "Encryption", "OWASP"]
+    },
+    {
+      title: "Performance",
+      icon: <FiZap className="skill-icon" />,
+      skills: ["Caching", "Load Balancing", "CDN", "Optimization", "Monitoring"]
     }
-  };
+  ];
 
   return (
-    <section className="skill" id="skills">
-        <div className="container">
-            <div className="row">
-                <div className="col-12">
-                    <div className="skill-bx wow zoomIn">
-                        <h2>{t('skills').title}</h2>
-                        <p>{t('skills').description}</p>
-                        <Carousel responsive={responsive} infinite={true} className="owl-carousel owl-theme skill-slider">
-                            <div className="item">
-                                <img src={reac} alt="Image" />
-                                <h5>React js</h5>
-                            </div>
-                            <div className="item">
-                                <img src={node} alt="Image" />
-                                <h5>Node js</h5>
-                            </div>
-                            <div className="item">
-                                <img src={js} alt="Image" />
-                                <h5>JavaScript</h5>
-                            </div>
-                            <div className="item">
-                                <img src={html} alt="Image" />
-                                <h5>HTML</h5>
-                            </div>
-                            <div className="item">
-                                <img src={css} alt="Image" />
-                                <h5>CSS</h5>
-                            </div>
-                            <div className="item">
-                                <img src={tailwind} alt="Image" />
-                                <h5>Tailwind</h5>
-                            </div>
-                            <div className="item">
-                                <img src={express} alt="Image" />
-                                <h5>Express js</h5>
-                            </div>
-                            <div className="item">
-                                <img src={mysql} alt="Image" />
-                                <h5>MySQL</h5>
-                            </div>
-                        </Carousel>
-                    </div>
-                </div>
-            </div>
+    <section className="skills-grid-wrapper" id="skills">
+      <div className="container">
+        <div className="skills-header wow zoomIn">
+          <h2>
+            Skills & <span className="highlight">Tecnologías</span>
+          </h2>
+          <p>{sectionDesc}</p>
         </div>
         
+        <div className="skills-grid wow zoomIn">
+          {skillCategories.map((category, index) => (
+            <div className="skill-card" key={index}>
+              {category.icon}
+              <h3>{category.title}</h3>
+              <div className="skill-tags">
+                {category.skills.map((skill, idx) => (
+                  <span className="skill-tag" key={idx}>{skill}</span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
-  )
-}
+  );
+};
