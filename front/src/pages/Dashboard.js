@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Container, Row, Col, Tab, Nav } from 'react-bootstrap';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { cvApi } from '../api';
+import { cvApi, skillsApi } from '../api';
 
 
 export const Dashboard = () => {
@@ -14,6 +14,25 @@ export const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [cvUploadStatusEn, setCvUploadStatusEn] = useState('');
   const [cvUploadStatusEs, setCvUploadStatusEs] = useState('');
+
+  const [skills, setSkills] = useState([]);
+  const [loadingSkills, setLoadingSkills] = useState(false);
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  const fetchSkills = async () => {
+    try {
+      setLoadingSkills(true);
+      const res = await skillsApi.getSkills();
+      setSkills(res.data);
+    } catch (err) {
+      console.error('Error fetching skills:', err);
+    } finally {
+      setLoadingSkills(false);
+    }
+  };
 
   const handleCVUpload = async (e, lang) => {
     const file = e.target.files[0];
@@ -343,6 +362,137 @@ export const Dashboard = () => {
     );
   };
 
+  const renderSkillsEditor = () => {
+    const handleSkillChange = (index, field, value) => {
+      const newSkills = [...skills];
+      newSkills[index][field] = value;
+      setSkills(newSkills);
+    };
+
+    const handleTagsChange = (index, value) => {
+      const newSkills = [...skills];
+      newSkills[index].skills = value.split(',').map(s => s.trim());
+      setSkills(newSkills);
+    };
+
+    const saveSkill = async (index) => {
+      try {
+        const skill = skills[index];
+        if (skill.id) {
+          await skillsApi.updateSkill(skill.id, skill);
+        } else {
+          const res = await skillsApi.createSkill(skill);
+          const newSkills = [...skills];
+          newSkills[index] = res.data;
+          setSkills(newSkills);
+        }
+        alert('Skill saved successfully!');
+      } catch (err) {
+        console.error(err);
+        alert('Error saving skill');
+      }
+    };
+
+    const deleteSkill = async (index) => {
+      if (!window.confirm('Are you sure you want to delete this category?')) return;
+      try {
+        const skill = skills[index];
+        if (skill.id) {
+          await skillsApi.deleteSkill(skill.id);
+        }
+        const newSkills = [...skills];
+        newSkills.splice(index, 1);
+        setSkills(newSkills);
+      } catch (err) {
+        console.error(err);
+        alert('Error deleting skill');
+      }
+    };
+
+    const addNewSkill = () => {
+      setSkills([...skills, { title: '', icon: 'FiCode', skills: [], order_index: skills.length + 1 }]);
+    };
+
+    return (
+      <div className="hero-config-form">
+        <div className="dashboard-subsection mb-5">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h5 className="subsection-title">Categorías de Skills</h5>
+              <p className="subsection-desc">Añade o edita las categorías y habilidades tecnológicas.</p>
+            </div>
+            <button className="btn-modern-small-success" onClick={addNewSkill}>+ Nueva Categoría</button>
+          </div>
+          
+          {loadingSkills ? <p className="text-white">Cargando skills...</p> : skills.map((skill, index) => (
+            <div key={index} className="dashboard-edit-group mb-4 p-3 border border-secondary rounded">
+              <Row className="mb-3">
+                <Col md={6}>
+                  <label className="dashboard-label">TÍTULO DE CATEGORÍA</label>
+                  <input
+                    type="text"
+                    className="dashboard-input w-100"
+                    value={skill.title || ''}
+                    onChange={(e) => handleSkillChange(index, 'title', e.target.value)}
+                    placeholder="Ej: Backend Development"
+                  />
+                </Col>
+                <Col md={3}>
+                  <label className="dashboard-label">ICONO</label>
+                  <select
+                    className="dashboard-input w-100"
+                    value={skill.icon || 'FiCode'}
+                    onChange={(e) => handleSkillChange(index, 'icon', e.target.value)}
+                  >
+                    <option value="FiServer">Servidor / Backend</option>
+                    <option value="FiDatabase">Base de Datos</option>
+                    <option value="FiCloud">Nube / DevOps</option>
+                    <option value="FiCode">Código / APIs</option>
+                    <option value="FiLock">Seguridad</option>
+                    <option value="FiZap">Rendimiento</option>
+                    <option value="FiMonitor">Monitor / UI</option>
+                    <option value="FiSmartphone">Móvil</option>
+                    <option value="FiCpu">CPU / Hardware</option>
+                    <option value="FiGlobe">Web / Redes</option>
+                    <option value="FiLayers">Arquitectura</option>
+                    <option value="FiTerminal">Consola / Scripts</option>
+                    <option value="FiTool">Herramientas</option>
+                    <option value="FiSettings">Configuración</option>
+                  </select>
+                </Col>
+                <Col md={3}>
+                  <label className="dashboard-label">ORDEN</label>
+                  <input
+                    type="number"
+                    className="dashboard-input w-100"
+                    value={skill.order_index || 0}
+                    onChange={(e) => handleSkillChange(index, 'order_index', parseInt(e.target.value))}
+                  />
+                </Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={12}>
+                  <label className="dashboard-label">SKILLS (Separadas por coma)</label>
+                  <input
+                    type="text"
+                    className="dashboard-input w-100"
+                    value={(skill.skills || []).join(', ')}
+                    onChange={(e) => handleTagsChange(index, e.target.value)}
+                    placeholder="Node.js, Python, Java..."
+                  />
+                </Col>
+              </Row>
+              <div className="d-flex justify-content-end">
+                <button className="btn-modern-small-danger me-2" onClick={() => deleteSkill(index)}>Eliminar</button>
+                <button className="btn-modern-outline" onClick={() => saveSkill(index)}>Guardar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
     { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
@@ -428,7 +578,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {sec.id === 'banner' ? renderHeroEditor() : renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>

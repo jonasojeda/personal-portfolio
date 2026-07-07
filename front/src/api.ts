@@ -53,4 +53,11 @@ export const cvApi = {
   }
 };
 
+export const skillsApi = {
+  getSkills: () => api.get('/skills'),
+  createSkill: (data: any) => api.post('/skills', data),
+  updateSkill: (id: number, data: any) => api.put(`/skills/${id}`, data),
+  deleteSkill: (id: number) => api.delete(`/skills/${id}`)
+};
+
 export default api;

@@ -1471,3 +1471,17 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   background-color: #2a3441;
   color: #fff;
 }
+
+.dashboard-input option {
+  background-color: #1a1e23;
+  color: #fff;
+}
+.dashboard-label {
+  color: #c9f31d; /* Or some visible color, maybe white? Let's use an off-white */
+  color: #d1d5db;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
