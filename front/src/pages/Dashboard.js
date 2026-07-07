@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { cvApi, skillsApi, experienceApi } from '../api';
+import { cvApi, skillsApi, experienceApi, projectApi } from '../api';
 
 
 export const Dashboard = () => {
@@ -22,10 +22,29 @@ export const Dashboard = () => {
   const [experiencesEs, setExperiencesEs] = useState([]);
   const [loadingExp, setLoadingExp] = useState(false);
 
+  const [projectsEn, setProjectsEn] = useState([]);
+  const [projectsEs, setProjectsEs] = useState([]);
+  const [loadingProj, setLoadingProj] = useState(false);
+
   useEffect(() => {
     fetchSkills();
     fetchExperiences();
+    fetchProjects();
   }, []);
+
+  const fetchProjects = async () => {
+    try {
+      setLoadingProj(true);
+      const resEn = await projectApi.getProjects('en');
+      const resEs = await projectApi.getProjects('es');
+      setProjectsEn(resEn.data);
+      setProjectsEs(resEs.data);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+    } finally {
+      setLoadingProj(false);
+    }
+  };
 
   const fetchExperiences = async () => {
     try {
@@ -634,6 +653,175 @@ export const Dashboard = () => {
     );
   };
 
+  const renderProjectEditor = () => {
+    const handleProjChange = (lang, index, field, value) => {
+      const projArray = lang === 'en' ? [...projectsEn] : [...projectsEs];
+      projArray[index][field] = value;
+      if (lang === 'en') setProjectsEn(projArray);
+      else setProjectsEs(projArray);
+    };
+
+    const handleMediaChange = (lang, projIndex, mediaIndex, field, value) => {
+      const projArray = lang === 'en' ? [...projectsEn] : [...projectsEs];
+      if (!projArray[projIndex].media) projArray[projIndex].media = [];
+      projArray[projIndex].media[mediaIndex][field] = value;
+      if (lang === 'en') setProjectsEn(projArray);
+      else setProjectsEs(projArray);
+    };
+
+    const addMedia = (lang, projIndex, type) => {
+      const projArray = lang === 'en' ? [...projectsEn] : [...projectsEs];
+      if (!projArray[projIndex].media) projArray[projIndex].media = [];
+      projArray[projIndex].media.push({ type, url: '' });
+      if (lang === 'en') setProjectsEn(projArray);
+      else setProjectsEs(projArray);
+    };
+
+    const removeMedia = (lang, projIndex, mediaIndex) => {
+      const projArray = lang === 'en' ? [...projectsEn] : [...projectsEs];
+      projArray[projIndex].media.splice(mediaIndex, 1);
+      if (lang === 'en') setProjectsEn(projArray);
+      else setProjectsEs(projArray);
+    };
+
+    const handleImageUpload = async (e, lang, projIndex, mediaIndex) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('image', file);
+      try {
+        const res = await projectApi.uploadImage(formData);
+        handleMediaChange(lang, projIndex, mediaIndex, 'url', res.data.url);
+      } catch (err) {
+        console.error(err);
+        alert('Error uploading image');
+      }
+    };
+
+    const saveProj = async (lang, index) => {
+      try {
+        const projArray = lang === 'en' ? projectsEn : projectsEs;
+        const proj = projArray[index];
+        if (proj.id) {
+          await projectApi.updateProject(proj.id, proj);
+        } else {
+          const res = await projectApi.createProject({ ...proj, lang });
+          const newArray = [...projArray];
+          newArray[index] = res.data;
+          if (lang === 'en') setProjectsEn(newArray);
+          else setProjectsEs(newArray);
+        }
+        alert('Project saved successfully!');
+      } catch (err) {
+        console.error(err);
+        alert('Error saving project');
+      }
+    };
+
+    const deleteProj = async (lang, index) => {
+      if (!window.confirm('Are you sure you want to delete this project?')) return;
+      try {
+        const projArray = lang === 'en' ? projectsEn : projectsEs;
+        const proj = projArray[index];
+        if (proj.id) {
+          await projectApi.deleteProject(proj.id);
+        }
+        const newArray = [...projArray];
+        newArray.splice(index, 1);
+        if (lang === 'en') setProjectsEn(newArray);
+        else setProjectsEs(newArray);
+      } catch (err) {
+        console.error(err);
+        alert('Error deleting project');
+      }
+    };
+
+    const addNewProj = (lang) => {
+      const newProj = { lang, title: '', description: '', long_description: '', github_url: '', deploy_url: '', media: [], order_index: 0 };
+      if (lang === 'en') setProjectsEn([...projectsEn, newProj]);
+      else setProjectsEs([...projectsEs, newProj]);
+    };
+
+    const renderColumn = (lang, projects) => (
+      <Col md={6}>
+        <div className="roles-column-box p-3 mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <span className={`lang-badge ${lang === 'en' ? 'bg-primary' : 'bg-warning text-dark'}`}>
+              {lang === 'en' ? 'EN - English' : 'ES - Español'}
+            </span>
+            <button className="btn-modern-small-success" onClick={() => addNewProj(lang)}>+ Añadir</button>
+          </div>
+          {loadingProj ? <p className="text-white">Loading...</p> : projects.map((proj, idx) => (
+            <div key={idx} className="dashboard-edit-group mb-4 p-3 border border-secondary rounded">
+              <label className="dashboard-label">TÍTULO DEL PROYECTO</label>
+              <input type="text" className="dashboard-input w-100 mb-2" value={proj.title || ''} onChange={(e) => handleProjChange(lang, idx, 'title', e.target.value)} />
+              
+              <label className="dashboard-label">DESCRIPCIÓN CORTA</label>
+              <input type="text" className="dashboard-input w-100 mb-2" value={proj.description || ''} onChange={(e) => handleProjChange(lang, idx, 'description', e.target.value)} />
+              
+              <label className="dashboard-label">DESCRIPCIÓN LARGA (Modal)</label>
+              <textarea className="dashboard-input w-100 mb-2" rows="4" value={proj.long_description || ''} onChange={(e) => handleProjChange(lang, idx, 'long_description', e.target.value)} />
+              
+              <Row>
+                <Col md={6}>
+                  <label className="dashboard-label">URL GITHUB</label>
+                  <input type="text" className="dashboard-input w-100 mb-2" value={proj.github_url || ''} onChange={(e) => handleProjChange(lang, idx, 'github_url', e.target.value)} />
+                </Col>
+                <Col md={6}>
+                  <label className="dashboard-label">URL DEPLOY</label>
+                  <input type="text" className="dashboard-input w-100 mb-2" value={proj.deploy_url || ''} onChange={(e) => handleProjChange(lang, idx, 'deploy_url', e.target.value)} />
+                </Col>
+              </Row>
+              
+              <label className="dashboard-label">ORDEN</label>
+              <input type="number" className="dashboard-input w-100 mb-3" value={proj.order_index || 0} onChange={(e) => handleProjChange(lang, idx, 'order_index', parseInt(e.target.value))} />
+
+              <div className="media-section mt-3 p-2 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                <label className="dashboard-label">MULTIMEDIA (Imágenes o Videos de YT)</label>
+                {(proj.media || []).map((m, mIdx) => (
+                  <div key={mIdx} className="d-flex align-items-center mb-2 gap-2">
+                    <span className="badge bg-secondary">{m.type === 'image' ? 'IMG' : 'YT'}</span>
+                    {m.type === 'youtube' ? (
+                      <input type="text" className="dashboard-input flex-grow-1 m-0" placeholder="Ej: https://youtube.com/watch?v=..." value={m.url || ''} onChange={(e) => handleMediaChange(lang, idx, mIdx, 'url', e.target.value)} />
+                    ) : (
+                      <div className="flex-grow-1">
+                        {m.url ? <span className="text-white small text-truncate d-inline-block" style={{maxWidth:'200px'}}>{m.url}</span> : null}
+                        <input type="file" className="form-control form-control-sm bg-dark text-white border-0" accept="image/*" onChange={(e) => handleImageUpload(e, lang, idx, mIdx)} />
+                      </div>
+                    )}
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => removeMedia(lang, idx, mIdx)}>x</button>
+                  </div>
+                ))}
+                <div className="d-flex gap-2 mt-2">
+                  <button className="btn btn-sm btn-outline-info" onClick={() => addMedia(lang, idx, 'image')}>+ Imagen</button>
+                  <button className="btn btn-sm btn-outline-danger" onClick={() => addMedia(lang, idx, 'youtube')}>+ YouTube</button>
+                </div>
+              </div>
+
+              <div className="d-flex justify-content-end mt-3">
+                <button className="btn-modern-small-danger me-2" onClick={() => deleteProj(lang, idx)}>Eliminar</button>
+                <button className="btn-modern-outline" onClick={() => saveProj(lang, idx)}>Guardar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Col>
+    );
+
+    return (
+      <div className="hero-config-form">
+        <div className="dashboard-subsection mb-5">
+          <h5 className="subsection-title">Gestión de Proyectos</h5>
+          <p className="subsection-desc">Edita tu portafolio bilingüe con soporte para múltiples imágenes y videos de YouTube.</p>
+          <Row>
+            {renderColumn('en', projectsEn)}
+            {renderColumn('es', projectsEs)}
+          </Row>
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
     { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
@@ -719,7 +907,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>

@@ -26,6 +26,7 @@ Route::post('login', [AccessTokenController::class, 'store']); // Kept from orig
 Route::get('hero', [HeroSectionController::class, 'index']);
 Route::get('skills', [\App\Http\Controllers\SkillCategoryController::class, 'index']);
 Route::get('experiences/{lang?}', [\App\Http\Controllers\ExperienceController::class, 'index']);
+Route::get('projects/{lang?}', [\App\Http\Controllers\ProjectController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('hero', [HeroSectionController::class, 'update']);
@@ -40,4 +41,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('experiences', [\App\Http\Controllers\ExperienceController::class, 'store']);
     Route::put('experiences/{id}', [\App\Http\Controllers\ExperienceController::class, 'update']);
     Route::delete('experiences/{id}', [\App\Http\Controllers\ExperienceController::class, 'destroy']);
+
+    // Project Management
+    Route::post('projects/upload-image', [\App\Http\Controllers\ProjectController::class, 'uploadImage']);
+    Route::post('projects', [\App\Http\Controllers\ProjectController::class, 'store']);
+    Route::put('projects/{id}', [\App\Http\Controllers\ProjectController::class, 'update']);
+    Route::delete('projects/{id}', [\App\Http\Controllers\ProjectController::class, 'destroy']);
 });

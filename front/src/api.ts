@@ -67,4 +67,14 @@ export const experienceApi = {
   deleteExperience: (id: number) => api.delete(`/experiences/${id}`)
 };
 
+export const projectApi = {
+  getProjects: (lang?: string) => api.get(`/projects${lang ? `/${lang}` : ''}`),
+  createProject: (data: any) => api.post('/projects', data),
+  updateProject: (id: number, data: any) => api.put(`/projects/${id}`, data),
+  deleteProject: (id: number) => api.delete(`/projects/${id}`),
+  uploadImage: (formData: FormData) => api.post('/projects/upload-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+};
+
 export default api;
