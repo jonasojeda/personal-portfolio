@@ -978,7 +978,6 @@ export const Dashboard = () => {
     { id: 'experience', name: 'Experience' },
     { id: 'projects', name: 'Projects' },
     { id: 'blog', name: 'Blog' },
-    { id: 'blog', name: 'Blog' },
     { id: 'contact', name: 'Contact' },
     { id: 'footer', name: 'Footer' },
   ];

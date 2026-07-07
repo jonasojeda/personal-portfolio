@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Modal, Button } from "react-bootstrap";
-import { ArrowRightCircle, Calendar, Person } from 'react-bootstrap-icons';
+import { ArrowRightCircle, Calendar, Person, ArrowLeft } from 'react-bootstrap-icons';
 import { useLanguage } from "../context/LanguageContext";
 import { blogApi } from "../api";
 import ReactMarkdown from 'react-markdown';
@@ -83,6 +83,14 @@ export const Blog = () => {
         <Modal.Body style={{ backgroundColor: '#121212', color: '#E0E0E0', padding: '0 20px 60px 20px' }}>
           {selectedArticle && (
             <Container className="blog-reading-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
+              <button 
+                onClick={handleClose} 
+                className="btn-modern-outline mb-4 d-flex align-items-center"
+                style={{ border: '1px solid rgba(255, 255, 255, 0.2)', color: '#fff', padding: '8px 20px', borderRadius: '50px', background: 'transparent' }}
+              >
+                <ArrowLeft className="me-2" /> {language === 'es' ? 'Volver al Inicio' : 'Back to Home'}
+              </button>
+
               <h1 className="blog-title mb-4" style={{ color: '#fff', fontSize: '3rem', fontWeight: 'bold' }}>{selectedArticle.title}</h1>
               
               <div className="blog-meta d-flex align-items-center mb-4 text-muted">
@@ -106,6 +114,18 @@ export const Blog = () => {
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {selectedArticle.content || selectedArticle.excerpt || ''}
                 </ReactMarkdown>
+              </div>
+
+              <hr style={{ borderColor: 'rgba(255, 255, 255, 0.1)', margin: '40px 0' }} />
+              
+              <div className="d-flex justify-content-center">
+                <button 
+                  onClick={handleClose} 
+                  className="btn-modern-outline d-flex align-items-center"
+                  style={{ border: '1px solid rgba(255, 255, 255, 0.2)', color: '#fff', padding: '10px 24px', borderRadius: '50px', background: 'transparent' }}
+                >
+                  <ArrowLeft className="me-2" /> {language === 'es' ? 'Volver al Inicio' : 'Back to Home'}
+                </button>
               </div>
             </Container>
           )}

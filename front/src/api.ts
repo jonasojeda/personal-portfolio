@@ -72,9 +72,22 @@ export const projectApi = {
   createProject: (data: any) => api.post('/projects', data),
   updateProject: (id: number, data: any) => api.put(`/projects/${id}`, data),
   deleteProject: (id: number) => api.delete(`/projects/${id}`),
-  uploadImage: (formData: FormData) => api.post('/projects/upload-image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  uploadImage: async (formData: FormData) => {
+    const token = localStorage.getItem('token');
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
+    const response = await fetch(`${baseUrl}/projects/upload-image`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+    const resData = await response.json();
+    return { data: resData };
+  }
 };
 
 export const blogApi = {
@@ -82,9 +95,22 @@ export const blogApi = {
   createBlog: (data: any) => api.post('/blogs', data),
   updateBlog: (id: number, data: any) => api.put(`/blogs/${id}`, data),
   deleteBlog: (id: number) => api.delete(`/blogs/${id}`),
-  uploadImage: (formData: FormData) => api.post('/blogs/upload-image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  })
+  uploadImage: async (formData: FormData) => {
+    const token = localStorage.getItem('token');
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000/api';
+    const response = await fetch(`${baseUrl}/blogs/upload-image`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.statusText}`);
+    }
+    const resData = await response.json();
+    return { data: resData };
+  }
 };
 
 export default api;

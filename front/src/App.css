@@ -1486,50 +1486,49 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   display: block;
 }
 
- / *   B l o g   M o d a l   S t y l e s   * / 
- . b l o g - m o d a l   . m o d a l - c o n t e n t   { 
-     b a c k g r o u n d - c o l o r :   # 1 2 1 2 1 2 ; 
-     c o l o r :   # E 0 E 0 E 0 ; 
- } 
- . b l o g - r e a d i n g - c o n t a i n e r   i m g   { 
-     m a x - w i d t h :   1 0 0 % ; 
- } 
- . b l o g - c o n t e n t   h 1 ,   . b l o g - c o n t e n t   h 2 ,   . b l o g - c o n t e n t   h 3   { 
-     c o l o r :   # f f f ; 
-     m a r g i n - t o p :   2 r e m ; 
-     m a r g i n - b o t t o m :   1 r e m ; 
- } 
- . b l o g - c o n t e n t   p   { 
-     m a r g i n - b o t t o m :   1 . 5 r e m ; 
- } 
- . b l o g - c o n t e n t   a   { 
-     c o l o r :   # 4 5 b a f c ; 
-     t e x t - d e c o r a t i o n :   n o n e ; 
- } 
- . b l o g - c o n t e n t   a : h o v e r   { 
-     t e x t - d e c o r a t i o n :   u n d e r l i n e ; 
- } 
- . b l o g - c o n t e n t   b l o c k q u o t e   { 
-     b o r d e r - l e f t :   4 p x   s o l i d   # 4 5 b a f c ; 
-     p a d d i n g - l e f t :   1 r e m ; 
-     c o l o r :   # a a a ; 
-     f o n t - s t y l e :   i t a l i c ; 
- } 
- . b l o g - c o n t e n t   p r e   { 
-     b a c k g r o u n d - c o l o r :   # 1 e 1 e 1 e ; 
-     p a d d i n g :   1 r e m ; 
-     b o r d e r - r a d i u s :   8 p x ; 
-     o v e r f l o w - x :   a u t o ; 
- } 
- . b l o g - c o n t e n t   c o d e   { 
-     c o l o r :   # f 8 c 5 5 5 ; 
-     b a c k g r o u n d - c o l o r :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 1 ) ; 
-     p a d d i n g :   0 . 2 r e m   0 . 4 r e m ; 
-     b o r d e r - r a d i u s :   4 p x ; 
- } 
- . b l o g - c o n t e n t   p r e   c o d e   { 
-     b a c k g r o u n d - c o l o r :   t r a n s p a r e n t ; 
-     p a d d i n g :   0 ; 
- } 
-  
- 
+/* Blog Modal Styles */
+.blog-modal .modal-content {
+  background-color: #121212;
+  color: #E0E0E0;
+}
+.blog-reading-container img {
+  max-width: 100%;
+}
+.blog-content h1, .blog-content h2, .blog-content h3 {
+  color: #fff;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+.blog-content p {
+  margin-bottom: 1.5rem;
+}
+.blog-content a {
+  color: #45bafc;
+  text-decoration: none;
+}
+.blog-content a:hover {
+  text-decoration: underline;
+}
+.blog-content blockquote {
+  border-left: 4px solid #45bafc;
+  padding-left: 1rem;
+  color: #aaa;
+  font-style: italic;
+}
+.blog-content pre {
+  background-color: #1e1e1e;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.blog-content code {
+  color: #f8c555;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
+.blog-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
