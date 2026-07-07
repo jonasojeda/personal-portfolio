@@ -25,6 +25,7 @@ Route::post('login', [AccessTokenController::class, 'store']); // Kept from orig
 
 Route::get('hero', [HeroSectionController::class, 'index']);
 Route::get('skills', [\App\Http\Controllers\SkillCategoryController::class, 'index']);
+Route::get('experiences/{lang?}', [\App\Http\Controllers\ExperienceController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('hero', [HeroSectionController::class, 'update']);
@@ -34,4 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('skills', [\App\Http\Controllers\SkillCategoryController::class, 'store']);
     Route::put('skills/{id}', [\App\Http\Controllers\SkillCategoryController::class, 'update']);
     Route::delete('skills/{id}', [\App\Http\Controllers\SkillCategoryController::class, 'destroy']);
+
+    // Experience Management
+    Route::post('experiences', [\App\Http\Controllers\ExperienceController::class, 'store']);
+    Route::put('experiences/{id}', [\App\Http\Controllers\ExperienceController::class, 'update']);
+    Route::delete('experiences/{id}', [\App\Http\Controllers\ExperienceController::class, 'destroy']);
 });

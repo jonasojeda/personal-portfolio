@@ -60,4 +60,11 @@ export const skillsApi = {
   deleteSkill: (id: number) => api.delete(`/skills/${id}`)
 };
 
+export const experienceApi = {
+  getExperiences: (lang?: string) => api.get(`/experiences${lang ? `/${lang}` : ''}`),
+  createExperience: (data: any) => api.post('/experiences', data),
+  updateExperience: (id: number, data: any) => api.put(`/experiences/${id}`, data),
+  deleteExperience: (id: number) => api.delete(`/experiences/${id}`)
+};
+
 export default api;

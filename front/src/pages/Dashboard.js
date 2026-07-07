@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { cvApi, skillsApi } from '../api';
+import { cvApi, skillsApi, experienceApi } from '../api';
 
 
 export const Dashboard = () => {
@@ -18,9 +18,28 @@ export const Dashboard = () => {
   const [skills, setSkills] = useState([]);
   const [loadingSkills, setLoadingSkills] = useState(false);
 
+  const [experiencesEn, setExperiencesEn] = useState([]);
+  const [experiencesEs, setExperiencesEs] = useState([]);
+  const [loadingExp, setLoadingExp] = useState(false);
+
   useEffect(() => {
     fetchSkills();
+    fetchExperiences();
   }, []);
+
+  const fetchExperiences = async () => {
+    try {
+      setLoadingExp(true);
+      const resEn = await experienceApi.getExperiences('en');
+      const resEs = await experienceApi.getExperiences('es');
+      setExperiencesEn(resEn.data);
+      setExperiencesEs(resEs.data);
+    } catch (err) {
+      console.error('Error fetching experiences:', err);
+    } finally {
+      setLoadingExp(false);
+    }
+  };
 
   const fetchSkills = async () => {
     try {
@@ -493,6 +512,128 @@ export const Dashboard = () => {
     );
   };
 
+  const renderExperienceEditor = () => {
+    const handleExpChange = (lang, index, field, value) => {
+      const expArray = lang === 'en' ? [...experiencesEn] : [...experiencesEs];
+      expArray[index][field] = value;
+      if (lang === 'en') setExperiencesEn(expArray);
+      else setExperiencesEs(expArray);
+    };
+
+    const saveExp = async (lang, index) => {
+      try {
+        const expArray = lang === 'en' ? experiencesEn : experiencesEs;
+        const exp = expArray[index];
+        if (exp.id) {
+          await experienceApi.updateExperience(exp.id, exp);
+        } else {
+          const res = await experienceApi.createExperience({ ...exp, lang });
+          const newArray = [...expArray];
+          newArray[index] = res.data;
+          if (lang === 'en') setExperiencesEn(newArray);
+          else setExperiencesEs(newArray);
+        }
+        alert('Experience saved successfully!');
+      } catch (err) {
+        console.error(err);
+        alert('Error saving experience');
+      }
+    };
+
+    const deleteExp = async (lang, index) => {
+      if (!window.confirm('Are you sure you want to delete this experience?')) return;
+      try {
+        const expArray = lang === 'en' ? experiencesEn : experiencesEs;
+        const exp = expArray[index];
+        if (exp.id) {
+          await experienceApi.deleteExperience(exp.id);
+        }
+        const newArray = [...expArray];
+        newArray.splice(index, 1);
+        if (lang === 'en') setExperiencesEn(newArray);
+        else setExperiencesEs(newArray);
+      } catch (err) {
+        console.error(err);
+        alert('Error deleting experience');
+      }
+    };
+
+    const addNewExp = (lang) => {
+      const newExp = { lang, title: '', company: '', date: '', description: '', order_index: 0 };
+      if (lang === 'en') setExperiencesEn([...experiencesEn, newExp]);
+      else setExperiencesEs([...experiencesEs, newExp]);
+    };
+
+    const renderColumn = (lang, experiences) => (
+      <Col md={6}>
+        <div className="roles-column-box p-3 mb-4">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <span className={`lang-badge ${lang === 'en' ? 'bg-primary' : 'bg-warning text-dark'}`}>
+              {lang === 'en' ? 'EN - English' : 'ES - Español'}
+            </span>
+            <button className="btn-modern-small-success" onClick={() => addNewExp(lang)}>+ Añadir</button>
+          </div>
+          {loadingExp ? <p className="text-white">Loading...</p> : experiences.map((exp, idx) => (
+            <div key={idx} className="dashboard-edit-group mb-4 p-3 border border-secondary rounded">
+              <label className="dashboard-label">TÍTULO DEL PUESTO</label>
+              <input
+                type="text"
+                className="dashboard-input w-100 mb-2"
+                value={exp.title || ''}
+                onChange={(e) => handleExpChange(lang, idx, 'title', e.target.value)}
+              />
+              <label className="dashboard-label">COMPAÑÍA</label>
+              <input
+                type="text"
+                className="dashboard-input w-100 mb-2"
+                value={exp.company || ''}
+                onChange={(e) => handleExpChange(lang, idx, 'company', e.target.value)}
+              />
+              <label className="dashboard-label">FECHA (Ej. 2021 - Present)</label>
+              <input
+                type="text"
+                className="dashboard-input w-100 mb-2"
+                value={exp.date || ''}
+                onChange={(e) => handleExpChange(lang, idx, 'date', e.target.value)}
+              />
+              <label className="dashboard-label">DESCRIPCIÓN</label>
+              <textarea
+                className="dashboard-input w-100 mb-2"
+                rows="4"
+                value={exp.description || ''}
+                onChange={(e) => handleExpChange(lang, idx, 'description', e.target.value)}
+              />
+              <label className="dashboard-label">ORDEN</label>
+              <input
+                type="number"
+                className="dashboard-input w-100 mb-3"
+                value={exp.order_index || 0}
+                onChange={(e) => handleExpChange(lang, idx, 'order_index', parseInt(e.target.value))}
+              />
+              <div className="d-flex justify-content-end mt-2">
+                <button className="btn-modern-small-danger me-2" onClick={() => deleteExp(lang, idx)}>Eliminar</button>
+                <button className="btn-modern-outline" onClick={() => saveExp(lang, idx)}>Guardar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Col>
+    );
+
+    return (
+      <div className="hero-config-form">
+        <div className="dashboard-subsection mb-5">
+          <h5 className="subsection-title">Experiencia Profesional</h5>
+          <p className="subsection-desc">Gestiona tu historial laboral. Debes guardarlas de forma independiente para cada idioma.</p>
+          <Row>
+            {renderColumn('en', experiencesEn)}
+            {renderColumn('es', experiencesEs)}
+          </Row>
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
     { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
@@ -578,7 +719,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>
