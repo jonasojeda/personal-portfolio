@@ -33,6 +33,19 @@ export const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Check local storage for recent submissions
+    let submissions = JSON.parse(localStorage.getItem('contact_submissions') || '[]');
+    const now = new Date().getTime();
+    // Keep only submissions from the last 60 minutes
+    submissions = submissions.filter(time => now - time < 3600000);
+    
+    if (submissions.length >= 10) {
+      const oldestTime = Math.min(...submissions);
+      const minutesLeft = Math.ceil((3600000 - (now - oldestTime)) / 60000);
+      setStatus({clas:'alert alert-warning', succes: false, message: `Has alcanzado el límite de 10 mensajes. Por favor, espera ${minutesLeft} minutos.`});
+      return;
+    }
+
     if(formDetails.email && formDetails.firstName && formDetails.lastName && formDetails.message){
       setButtonText(t('contact').sending);
       
@@ -48,19 +61,28 @@ export const Contact = () => {
         backendSuccess = true;
       } catch (err) {
         console.error("Error saving message to database:", err);
+        if (err.response && err.response.status === 429) {
+           setButtonText(t('contact').send);
+           setStatus({clas:'alert alert-warning', succes: false, message: 'Demasiadas solicitudes. Por favor intenta más tarde.'});
+           return; // Stop execution, don't send EmailJS
+        }
       }
 
       let res;
-      try {
-        res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn');
-      } catch (err) {
-        console.error("Error sending email via EmailJS:", err);
+      if (backendSuccess) {
+        try {
+          res = await emailjs.sendForm('service_yyw7gpo','template_pjbi0oa',e.target,'6CtWNYVRNqRmedPgn');
+        } catch (err) {
+          console.error("Error sending email via EmailJS:", err);
+        }
       }
       
       setButtonText(t('contact').send);
       setFormDetails(formInitialDetails);
 
       if (backendSuccess || (res && res.status === 200)) {
+        submissions.push(new Date().getTime());
+        localStorage.setItem('contact_submissions', JSON.stringify(submissions));
         setStatus({clas:'alert alert-success', succes: true, message: t('contact').success});
       } else {
         setStatus({ clas:'alert alert-danger', succes: false, message: t('contact').error});

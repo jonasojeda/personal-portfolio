@@ -28,7 +28,7 @@ Route::get('skills', [\App\Http\Controllers\SkillCategoryController::class, 'ind
 Route::get('experiences/{lang?}', [\App\Http\Controllers\ExperienceController::class, 'index']);
 Route::get('projects/{lang?}', [\App\Http\Controllers\ProjectController::class, 'index']);
 Route::get('blogs/{lang?}', [\App\Http\Controllers\BlogController::class, 'index']);
-Route::post('contacts', [\App\Http\Controllers\ContactMessageController::class, 'store']);
+Route::post('contacts', [\App\Http\Controllers\ContactMessageController::class, 'store'])->middleware('throttle:10,60');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('hero', [HeroSectionController::class, 'update']);
