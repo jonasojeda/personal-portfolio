@@ -28,6 +28,7 @@ export const authApi = {
   login: (credentials: any) => api.post('/login', credentials),
   getTokens: () => api.get('/tokens'),
   deleteTokens: () => api.delete('/tokens'),
+  updateProfile: (data: any) => api.put('/user/profile', data),
 };
 
 export const heroApi = {

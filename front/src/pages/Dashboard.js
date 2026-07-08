@@ -4,12 +4,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { cvApi, skillsApi, experienceApi, projectApi, blogApi, contactApi } from '../api';
+import { cvApi, skillsApi, experienceApi, projectApi, blogApi, contactApi, authApi } from '../api';
 
 
 export const Dashboard = () => {
   const { translations, updateTranslation } = useLanguage();
-  const { logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('banner');
@@ -19,6 +19,12 @@ export const Dashboard = () => {
   const [contactStartDate, setContactStartDate] = useState('');
   const [contactEndDate, setContactEndDate] = useState('');
   
+  const [profileEmail, setProfileEmail] = useState(user?.email || '');
+  const [profileCurrentPassword, setProfileCurrentPassword] = useState('');
+  const [profileNewPassword, setProfileNewPassword] = useState('');
+  const [profileConfirmPassword, setProfileConfirmPassword] = useState('');
+  const [profileUpdateStatus, setProfileUpdateStatus] = useState(null);
+
   const [cvUploadStatusEn, setCvUploadStatusEn] = useState('');
   const [cvUploadStatusEs, setCvUploadStatusEs] = useState('');
 
@@ -1161,6 +1167,94 @@ export const Dashboard = () => {
     );
   };
 
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    setProfileUpdateStatus(null);
+    try {
+      const data = {
+        email: profileEmail,
+        current_password: profileCurrentPassword,
+        password: profileNewPassword,
+        password_confirmation: profileConfirmPassword,
+      };
+      const res = await authApi.updateProfile(data);
+      setProfileUpdateStatus({ success: true, message: res.data.message });
+      if (res.data.user) {
+        updateUser(res.data.user);
+      }
+      setProfileCurrentPassword('');
+      setProfileNewPassword('');
+      setProfileConfirmPassword('');
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      const msg = err.response?.data?.message || 'Error al actualizar el perfil.';
+      setProfileUpdateStatus({ success: false, message: msg });
+    }
+  };
+
+  const renderProfileEditor = () => {
+    return (
+      <div className="profile-editor-container">
+        <div className="dashboard-subsection mb-5">
+          <h5 className="subsection-title" style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '10px' }}>Ajustes de Perfil</h5>
+          <p className="subsection-desc" style={{ color: '#888', fontSize: '0.9rem', marginBottom: '20px' }}>Actualiza tu correo de acceso o cambia tu contraseña.</p>
+          
+          {profileUpdateStatus && (
+            <div className={`alert ${profileUpdateStatus.success ? 'alert-success' : 'alert-danger'} mb-4`}>
+              {profileUpdateStatus.message}
+            </div>
+          )}
+
+          <form onSubmit={handleProfileUpdate} style={{ maxWidth: '600px', backgroundColor: 'rgba(255, 255, 255, 0.05)', padding: '20px', borderRadius: '8px' }}>
+            <div className="mb-3">
+              <label className="dashboard-label">Correo Electrónico</label>
+              <input 
+                type="email" 
+                className="dashboard-input w-100" 
+                value={profileEmail} 
+                onChange={(e) => setProfileEmail(e.target.value)} 
+                required 
+              />
+            </div>
+            <div className="mb-3">
+              <label className="dashboard-label">Contraseña Actual *</label>
+              <input 
+                type="password" 
+                className="dashboard-input w-100" 
+                value={profileCurrentPassword} 
+                onChange={(e) => setProfileCurrentPassword(e.target.value)} 
+                required 
+              />
+              <small className="text-muted">Necesaria para autorizar cualquier cambio.</small>
+            </div>
+            <hr className="my-4" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+            <div className="mb-3">
+              <label className="dashboard-label">Nueva Contraseña (Opcional)</label>
+              <input 
+                type="password" 
+                className="dashboard-input w-100" 
+                value={profileNewPassword} 
+                onChange={(e) => setProfileNewPassword(e.target.value)} 
+                minLength={8}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="dashboard-label">Confirmar Nueva Contraseña</label>
+              <input 
+                type="password" 
+                className="dashboard-input w-100" 
+                value={profileConfirmPassword} 
+                onChange={(e) => setProfileConfirmPassword(e.target.value)} 
+                minLength={8}
+              />
+            </div>
+            <button type="submit" className="btn-modern w-100">Actualizar Perfil</button>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   const sections = [
     { id: 'banner', name: 'Hero section' },
     { id: 'skills', name: 'Skills' },
@@ -1169,6 +1263,7 @@ export const Dashboard = () => {
     { id: 'blog', name: 'Blog' },
     { id: 'contact', name: 'Contact' },
     { id: 'footer', name: 'Footer' },
+    { id: 'profile', name: 'Perfil' },
   ];
 
   return (
@@ -1262,7 +1357,7 @@ export const Dashboard = () => {
                     <h4 className="content-title">Sección: <span className="highlight-text">{sec.name}</span></h4>
                     <p className="text-muted mb-4">Los cambios que guardes aquí se reflejarán instantáneamente en la web.</p>
                     <div className="editor-container">
-                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : sec.id === 'blog' ? renderBlogEditor() : sec.id === 'contact' ? renderContactEditor() : renderStringEditor(sec.id)}
+                      {sec.id === 'banner' ? renderHeroEditor() : sec.id === 'skills' ? renderSkillsEditor() : sec.id === 'experience' ? renderExperienceEditor() : sec.id === 'projects' ? renderProjectEditor() : sec.id === 'blog' ? renderBlogEditor() : sec.id === 'contact' ? renderContactEditor() : sec.id === 'profile' ? renderProfileEditor() : renderStringEditor(sec.id)}
                     </div>
                   </div>
                 </Tab.Pane>

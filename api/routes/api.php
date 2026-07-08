@@ -60,4 +60,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('contacts', [\App\Http\Controllers\ContactMessageController::class, 'index']);
     Route::put('contacts/{id}', [\App\Http\Controllers\ContactMessageController::class, 'update']);
     Route::delete('contacts/{id}', [\App\Http\Controllers\ContactMessageController::class, 'destroy']);
+    // Profile Management
+    Route::put('user/profile', [\App\Http\Controllers\ProfileController::class, 'update']);
 });
