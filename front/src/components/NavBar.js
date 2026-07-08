@@ -50,9 +50,8 @@ export const NavBar = () => {
             </Nav>
             <span className="navbar-text">
               <div className="social-icon">
-                <a href="https://www.linkedin.com/in/jonas-ojeda-18308a1ab/" target='_blank'><img src={navIcon1} alt="" /></a>
-                <a href="https://github.com/jonasojeda" target='_blank'><img src={navIcon2} alt="" /></a>
-                
+                <a href={t('footer').linkedin || "https://www.linkedin.com/in/jonas-ojeda-18308a1ab/"} target='_blank'><img src={navIcon1} alt="LinkedIn" /></a>
+                <a href={t('footer').github || "https://github.com/jonasojeda"} target='_blank'><img src={navIcon2} alt="GitHub" /></a>
               </div>
               <HashLink to='#connect'>
                 <button className="vvd"><span>{t('nav').connect}</span></button>

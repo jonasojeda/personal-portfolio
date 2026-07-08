@@ -161,6 +161,7 @@ export const Dashboard = () => {
       
       // Only handle direct strings for simplicity in this dashboard mockup
       if (typeof valEn === 'string') {
+        if (section === 'footer' && !['linkedin', 'github'].includes(key)) return null;
         return (
           <div key={key} className="dashboard-edit-group mb-4">
             <label className="dashboard-label">{key.toUpperCase()}</label>

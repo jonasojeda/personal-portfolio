@@ -88,7 +88,9 @@ const defaultTranslations = {
       newsletterTitle: "Subscribe to our Newsletter",
       emailPlaceholder: "Email Address",
       submit: "Submit",
-      copyRight: "Copyright 2026. All Rights Reserved"
+      copyRight: "Copyright 2026. All Rights Reserved",
+      linkedin: "https://www.linkedin.com/in/jonas-ojeda-18308a1ab/",
+      github: "https://github.com/jonasojeda"
     }
   },
   es: {
@@ -176,7 +178,9 @@ const defaultTranslations = {
       newsletterTitle: "Suscríbete a nuestro boletín",
       emailPlaceholder: "Correo Electrónico",
       submit: "Enviar",
-      copyRight: "Derechos reservados 2026."
+      copyRight: "Derechos reservados 2026.",
+      linkedin: "https://www.linkedin.com/in/jonas-ojeda-18308a1ab/",
+      github: "https://github.com/jonasojeda"
     }
   }
 };
@@ -187,7 +191,24 @@ export const LanguageProvider = ({ children }) => {
   // Load translations from localStorage or use defaults
   const [translations, setTranslations] = useState(() => {
     const saved = localStorage.getItem('portfolio_translations');
-    return saved ? JSON.parse(saved) : defaultTranslations;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const merged = JSON.parse(JSON.stringify(defaultTranslations));
+      ['en', 'es'].forEach(lang => {
+        if (parsed[lang]) {
+          Object.keys(defaultTranslations[lang]).forEach(section => {
+            if (parsed[lang][section]) {
+              merged[lang][section] = {
+                ...defaultTranslations[lang][section],
+                ...parsed[lang][section]
+              };
+            }
+          });
+        }
+      });
+      return merged;
+    }
+    return defaultTranslations;
   });
 
   // Save to localStorage whenever translations change
