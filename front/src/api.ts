@@ -116,6 +116,7 @@ export const blogApi = {
 export const contactApi = {
   submitMessage: (data: any) => api.post('/contacts', data),
   getMessages: () => api.get('/contacts'),
+  updateMessage: (id: number, data: any) => api.put(`/contacts/${id}`, data),
   deleteMessage: (id: number) => api.delete(`/contacts/${id}`)
 };
 

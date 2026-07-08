@@ -58,5 +58,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Contact Messages Management
     Route::get('contacts', [\App\Http\Controllers\ContactMessageController::class, 'index']);
+    Route::put('contacts/{id}', [\App\Http\Controllers\ContactMessageController::class, 'update']);
     Route::delete('contacts/{id}', [\App\Http\Controllers\ContactMessageController::class, 'destroy']);
 });

@@ -33,6 +33,23 @@ class ContactMessageController extends Controller
         ], 201);
     }
 
+    public function update(Request $request, $id)
+    {
+        $message = ContactMessage::findOrFail($id);
+        
+        $validated = $request->validate([
+            'is_read' => 'required|boolean',
+        ]);
+
+        $message->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message updated successfully',
+            'data' => $message
+        ]);
+    }
+
     public function destroy($id)
     {
         $message = ContactMessage::findOrFail($id);

@@ -12,6 +12,13 @@ export const Dashboard = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState('banner');
+  const [unreadCount, setUnreadCount] = useState(0);
+  
+  const [contactFilterStatus, setContactFilterStatus] = useState('all');
+  const [contactStartDate, setContactStartDate] = useState('');
+  const [contactEndDate, setContactEndDate] = useState('');
+  
   const [cvUploadStatusEn, setCvUploadStatusEn] = useState('');
   const [cvUploadStatusEs, setCvUploadStatusEs] = useState('');
 
@@ -39,6 +46,13 @@ export const Dashboard = () => {
     fetchProjects();
     fetchBlogs();
     fetchContactMessages();
+
+    // Poll for new messages every 30 seconds
+    const interval = setInterval(() => {
+      fetchContactMessages(true);
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchBlogs = async () => {
@@ -55,15 +69,33 @@ export const Dashboard = () => {
     }
   };
 
-  const fetchContactMessages = async () => {
+  const fetchContactMessages = async (isPolling = false) => {
     try {
-      setLoadingContacts(true);
+      if (!isPolling) setLoadingContacts(true);
       const res = await contactApi.getMessages();
       setContactMessages(res.data);
+      
+      // Calculate unread count using is_read attribute
+      const unread = res.data.filter(msg => !msg.is_read).length;
+      setUnreadCount(unread);
     } catch (err) {
       console.error('Error fetching contact messages:', err);
     } finally {
-      setLoadingContacts(false);
+      if (!isPolling) setLoadingContacts(false);
+    }
+  };
+
+  const markContactMessageRead = async (id, currentStatus) => {
+    try {
+      const res = await contactApi.updateMessage(id, { is_read: !currentStatus });
+      setContactMessages(contactMessages.map(msg => msg.id === id ? res.data.data : msg));
+      
+      // Update unread count immediately
+      const updatedMessages = contactMessages.map(msg => msg.id === id ? res.data.data : msg);
+      setUnreadCount(updatedMessages.filter(msg => !msg.is_read).length);
+    } catch (err) {
+      console.error('Error updating message status:', err);
+      alert('Error al actualizar el estado del mensaje.');
     }
   };
 
@@ -1002,6 +1034,27 @@ export const Dashboard = () => {
   };
 
   const renderContactEditor = () => {
+    const filteredMessages = contactMessages.filter(msg => {
+      // Status Filter
+      if (contactFilterStatus === 'read' && !msg.is_read) return false;
+      if (contactFilterStatus === 'unread' && msg.is_read) return false;
+      
+      // Date Filter
+      if (contactStartDate) {
+        const msgDate = new Date(msg.created_at);
+        const startDate = new Date(contactStartDate);
+        startDate.setHours(0, 0, 0, 0);
+        if (msgDate < startDate) return false;
+      }
+      if (contactEndDate) {
+        const msgDate = new Date(msg.created_at);
+        const endDate = new Date(contactEndDate);
+        endDate.setHours(23, 59, 59, 999);
+        if (msgDate > endDate) return false;
+      }
+      return true;
+    });
+
     return (
       <div className="contact-editor-container">
         <div className="dashboard-subsection mb-5">
@@ -1015,10 +1068,30 @@ export const Dashboard = () => {
         <div className="dashboard-subsection">
           <h5 className="subsection-title" style={{ color: '#fff', fontSize: '1.2rem', marginBottom: '10px' }}>Mensajes de Contacto Recibidos</h5>
           <p className="subsection-desc" style={{ color: '#888', fontSize: '0.9rem', marginBottom: '20px' }}>Visualiza y gestiona las solicitudes de contacto enviadas por los usuarios.</p>
+          
+          <div className="filters-container d-flex gap-3 mb-4 p-3 rounded" style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}>
+            <div>
+              <label className="text-white small mb-1 d-block">Estado</label>
+              <select className="form-select bg-dark text-white border-secondary" value={contactFilterStatus} onChange={(e) => setContactFilterStatus(e.target.value)}>
+                <option value="all">Todos</option>
+                <option value="unread">No Leídos</option>
+                <option value="read">Leídos</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-white small mb-1 d-block">Desde</label>
+              <input type="date" className="form-control bg-dark text-white border-secondary" value={contactStartDate} onChange={(e) => setContactStartDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="text-white small mb-1 d-block">Hasta</label>
+              <input type="date" className="form-control bg-dark text-white border-secondary" value={contactEndDate} onChange={(e) => setContactEndDate(e.target.value)} />
+            </div>
+          </div>
+
           {loadingContacts ? (
             <p className="text-white">Cargando mensajes...</p>
-          ) : contactMessages.length === 0 ? (
-            <p className="text-muted">No se han recibido mensajes de contacto.</p>
+          ) : filteredMessages.length === 0 ? (
+            <p className="text-muted">No se han encontrado mensajes que coincidan con los filtros.</p>
           ) : (
             <div className="table-responsive" style={{ maxHeight: '600px', overflowY: 'auto' }}>
               <table className="table table-dark table-striped table-bordered align-middle text-white" style={{ backgroundColor: '#1a1e23', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
@@ -1033,37 +1106,49 @@ export const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {contactMessages.map(msg => (
-                    <tr key={msg.id}>
-                      <td style={{ fontWeight: '600', padding: '12px' }}>{msg.first_name} {msg.last_name}</td>
+                  {filteredMessages.map(msg => (
+                    <tr key={msg.id} style={{ opacity: msg.is_read ? 0.7 : 1 }}>
+                      <td style={{ fontWeight: msg.is_read ? 'normal' : 'bold', padding: '12px' }}>
+                        {msg.first_name} {msg.last_name}
+                        {!msg.is_read && <span className="badge bg-danger ms-2">Nuevo</span>}
+                      </td>
                       <td style={{ padding: '12px' }}>
                         <a href={`mailto:${msg.email}`} style={{ color: '#45bafc', textDecoration: 'none' }}>
                           {msg.email}
                         </a>
                       </td>
                       <td style={{ padding: '12px' }}>{msg.phone || '-'}</td>
-                      <td style={{ whiteSpace: 'pre-wrap', minWidth: '200px', maxWidth: '300px', padding: '12px' }}>{msg.message}</td>
+                      <td style={{ whiteSpace: 'pre-wrap', minWidth: '200px', maxWidth: '300px', padding: '12px', fontWeight: msg.is_read ? 'normal' : '600' }}>{msg.message}</td>
                       <td style={{ padding: '12px', fontSize: '0.85rem' }}>{new Date(msg.created_at).toLocaleString()}</td>
                       <td style={{ padding: '12px' }}>
-                        <button 
-                          className="btn-modern-small-danger" 
-                          onClick={() => deleteContactMessage(msg.id)}
-                          style={{
-                            padding: '6px 12px',
-                            backgroundColor: '#dc3545',
-                            border: 'none',
-                            borderRadius: '4px',
-                            color: '#fff',
-                            cursor: 'pointer',
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            transition: 'background-color 0.2s'
-                          }}
-                          onMouseOver={(e) => e.target.style.backgroundColor = '#bd2130'}
-                          onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
-                        >
-                          Eliminar
-                        </button>
+                        <div className="d-flex flex-column gap-2">
+                          <button 
+                            className="btn btn-sm btn-outline-info" 
+                            onClick={() => markContactMessageRead(msg.id, msg.is_read)}
+                            style={{ fontSize: '0.8rem', padding: '4px 8px' }}
+                          >
+                            {msg.is_read ? 'Marcar No Leído' : 'Marcar Leído'}
+                          </button>
+                          <button 
+                            className="btn-modern-small-danger" 
+                            onClick={() => deleteContactMessage(msg.id)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: '#dc3545',
+                              border: 'none',
+                              borderRadius: '4px',
+                              color: '#fff',
+                              cursor: 'pointer',
+                              fontSize: '0.85rem',
+                              fontWeight: '600',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseOver={(e) => e.target.style.backgroundColor = '#bd2130'}
+                            onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1090,7 +1175,7 @@ export const Dashboard = () => {
     <section className="dashboard-layout">
       <div className="login-grid-overlay"></div>
       
-      <Tab.Container id="dashboard-tabs" defaultActiveKey="banner">
+      <Tab.Container id="dashboard-tabs" activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
         <aside className={`sidebar-full ${sidebarOpen ? 'open' : 'closed'}`}>
           <div className="sidebar-header" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
             {sidebarOpen ? (
@@ -1144,7 +1229,23 @@ export const Dashboard = () => {
               <h1 className="header-title">EDICIÓN DE CONTENIDO</h1>
               <p className="header-subtitle">PORTFOLIO PERSONAL <span>ACTUALIZACIÓN EN VIVO</span></p>
             </div>
-            <div className="header-actions">
+            <div className="header-actions d-flex align-items-center">
+              <div 
+                className="notification-bell me-4 position-relative" 
+                style={{ cursor: 'pointer' }}
+                onClick={() => setActiveTab('contact')}
+                title="Mensajes de Contacto"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#fff" viewBox="0 0 16 16">
+                  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
+                    {unreadCount}
+                    <span className="visually-hidden">mensajes no leídos</span>
+                  </span>
+                )}
+              </div>
               <button className="btn-modern-outline me-3" onClick={() => navigate('/')}>Ir al Sitio</button>
               <div className="status-indicator">
                 <span className="dot"></span>
