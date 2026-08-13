@@ -80,7 +80,7 @@ export const Blog = () => {
       <Modal show={showModal} onHide={handleClose} size="lg" centered className="blog-modal">
         <Modal.Header closeButton closeVariant="white" style={{ backgroundColor: '#121212', borderBottom: 'none' }}>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: '#121212', color: '#E0E0E0', padding: '0 30px 40px 30px' }}>
+        <Modal.Body style={{ backgroundColor: '#121212', color: '#E0E0E0', padding: '0 30px 40px 30px', maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
           {selectedArticle && (
             <Container className="blog-reading-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
               <button 

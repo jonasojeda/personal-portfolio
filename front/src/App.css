@@ -1540,7 +1540,7 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   padding: 0;
 }
 
-/* Fix for project modal overlapping with navbar */
-.project-modal.modal {
+/* Fix for project and blog modal overlapping with navbar */
+.project-modal.modal, .blog-modal.modal {
   padding-top: 80px !important;
 }
