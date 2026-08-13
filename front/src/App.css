@@ -1532,3 +1532,7 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   padding: 0;
 }
 
+/* Fix for project modal overlapping with navbar */
+.project-modal.modal {
+  padding-top: 80px !important;
+}

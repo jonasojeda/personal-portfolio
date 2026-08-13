@@ -96,16 +96,18 @@ export const Projects = () => {
         <Modal.Header closeButton closeVariant="white" style={{ backgroundColor: '#151515', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <Modal.Title style={{ color: '#fff' }}>{selectedProject?.title}</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: '#151515', color: '#B8B8B8' }}>
+        <Modal.Body style={{ backgroundColor: '#151515', color: '#B8B8B8', maxHeight: 'calc(100vh - 210px)', overflowY: 'auto' }}>
           {selectedProject && (
             <div className="text-center">
               {selectedProject.media && selectedProject.media.length > 0 ? (
                 selectedProject.media.length === 1 ? (
                   // Display single media
                   selectedProject.media[0].type === 'image' ? (
-                    <img src={selectedProject.media[0].url} alt={selectedProject.title} className="img-fluid mb-4 rounded" />
+                    <div className="mb-4 d-flex justify-content-center align-items-center" style={{ height: '350px', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+                      <img src={selectedProject.media[0].url} alt={selectedProject.title} className="img-fluid" style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }} />
+                    </div>
                   ) : (
-                    <div className="ratio ratio-16x9 mb-4">
+                    <div className="ratio ratio-16x9 mb-4" style={{ maxHeight: '350px' }}>
                       <iframe src={`https://www.youtube.com/embed/${getYoutubeId(selectedProject.media[0].url)}`} title={selectedProject.title} allowFullScreen></iframe>
                     </div>
                   )
@@ -115,9 +117,11 @@ export const Projects = () => {
                     {selectedProject.media.map((m, idx) => (
                       <Carousel.Item key={idx}>
                         {m.type === 'image' ? (
-                          <img src={m.url} alt={`${selectedProject.title} ${idx}`} className="d-block w-100 rounded" style={{ objectFit: 'contain', maxHeight: '400px' }} />
+                          <div className="d-flex justify-content-center align-items-center" style={{ height: '350px', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+                            <img src={m.url} alt={`${selectedProject.title} ${idx}`} className="img-fluid" style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }} />
+                          </div>
                         ) : (
-                          <div className="ratio ratio-16x9">
+                          <div className="ratio ratio-16x9" style={{ maxHeight: '350px' }}>
                             <iframe src={`https://www.youtube.com/embed/${getYoutubeId(m.url)}`} title={selectedProject.title} allowFullScreen></iframe>
                           </div>
                         )}
@@ -126,7 +130,9 @@ export const Projects = () => {
                   </Carousel>
                 )
               ) : (
-                <img src="https://via.placeholder.com/800x400?text=No+Media" alt={selectedProject.title} className="img-fluid mb-4 rounded" />
+                <div className="mb-4 d-flex justify-content-center align-items-center" style={{ height: '350px', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+                  <img src="https://via.placeholder.com/800x400?text=No+Media" alt={selectedProject.title} className="img-fluid" style={{ objectFit: 'contain', maxHeight: '100%', maxWidth: '100%' }} />
+                </div>
               )}
               
               <p style={{ fontSize: '1.1rem', whiteSpace: 'pre-line' }}>{selectedProject.long_description || selectedProject.description}</p>
