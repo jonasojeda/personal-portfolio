@@ -83,7 +83,7 @@ p.danger {
 }
 /************ Navbar Css ************/
 nav.navbar {
-  padding: 18px 0;
+  padding: 8px 0;
   position: fixed;
   width: 100%;
   top: 0;
@@ -95,7 +95,8 @@ nav.navbar.scrolled {
   background-color: #121212;
 }
 nav.navbar a.navbar-brand {
-    width: 25%;
+    width: 15%;
+    max-width: 160px;
 }
 nav.navbar .navbar-nav .nav-link.navbar-link {
   font-weight: 400;
@@ -154,7 +155,7 @@ span.navbar-text {
   font-weight: 700;
   color: #fff;
   border: 1px solid #fff;
-  padding: 18px 34px;
+  padding: 10px 24px;
   font-size: 18px;
   margin-left: 18px;
 	position: relative;
